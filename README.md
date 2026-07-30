@@ -157,6 +157,7 @@ Documentação:
 - Produto: [`docs/PRD.md`](docs/PRD.md)
 - Stack: [`docs/STACK.md`](docs/STACK.md)
 - Publicar npm/Bun: [`docs/PUBLISH.md`](docs/PUBLISH.md)
+- Deploy Vercel + Neon: [`docs/DEPLOY.md`](docs/DEPLOY.md)
 - Kanban: [`.devtool/features/`](.devtool/features/)
 
 ---

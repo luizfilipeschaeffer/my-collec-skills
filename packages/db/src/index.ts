@@ -4,7 +4,14 @@ import { resolve } from "node:path";
 import { PrismaClient } from "../../../generated/client";
 
 if (!process.env.DATABASE_URL && process.env.NODE_ENV !== "production") {
+  // Prefer monorepo root .env, then apps/web/.env.local when running the web app.
   config({ path: resolve(process.cwd(), "../../.env") });
+  if (!process.env.DATABASE_URL) {
+    config({ path: resolve(process.cwd(), ".env.local") });
+  }
+  if (!process.env.DATABASE_URL) {
+    config({ path: resolve(process.cwd(), "../../apps/web/.env.local") });
+  }
 }
 
 const globalForPrisma = globalThis as unknown as {
