@@ -23,10 +23,12 @@ Falta um jeito leve de:
 | Capacidade | O que faz |
 | --- | --- |
 | **Profiles** | Pacotes nomeados (ex.: “Next.js + Prisma + Neon”) |
-| **Collections** | Coleções por categoria para **skills**, **agents** e **MCPs** |
+| **Collections** | Coleções por **categoria + subcategoria** para **skills**, **agents** e **MCPs** |
 | **Connectors** | Busca direta em bibliotecas de skills, docs e registries de MCPs |
 | **IDE extensions** | Extensões pré-selecionadas por IDE (Cursor / VS Code / JetBrains / Nova / windsurf) |
 | **Share + Apply** | Compartilhar perfil e aplicar no ambiente local |
+| **CLI `mcs`** | Install sem fricção: `mcs install --username <user> --perfil <slug>` |
+| **Extensão IDE `mcs`** | Painel na IDE para gerenciar skills/coleções/profiles e apply local |
 
 ### Coleções por categoria
 
@@ -34,12 +36,14 @@ O mesmo padrão vale para **skills**, **agents** e **MCPs**:
 
 1. Buscar no conector  
 2. Selecionar itens  
-3. Agrupar em uma coleção por categoria  
+3. Escolher **categoria → subcategoria** e agrupar em uma coleção  
 4. Anexar a coleção a um ou mais profiles  
 
 **Categorias iniciais (seed):** UI · UX · Accessibility · Database · Cybersecurity  
 
-*(extensíveis depois)*
+**Subcategorias (exemplos):** UI/Components · Database/Prisma · Cybersecurity/OWASP · Accessibility/WCAG  
+
+*(extensíveis depois; mesma árvore para skills, agents e MCPs)*
 
 ---
 
@@ -73,14 +77,40 @@ Login (GitHub / GitLab)
 Buscar skills / agents / MCPs / docs
         │
         ▼
-Criar coleções por categoria
+Criar coleções por categoria / subcategoria
         │
         ▼
 Montar Profile (+ extensões por IDE)
         │
         ├──► Compartilhar (link / export)
-        └──► Aplicar na IDE (local)
+        ├──► Aplicar via CLI mcs
+        └──► Aplicar via extensão IDE mcs
 ```
+
+### Install via CLI (`mcs`)
+
+Mesma mentalidade de `npm` / `pnpm` / `bun` / `yarn install` — um comando e o ambiente sobe:
+
+```bash
+npx mcs install --username alice --perfil nextjs-prisma
+pnpm dlx mcs install --username alice --perfil nextjs-prisma
+bunx mcs install --username alice --perfil nextjs-prisma
+yarn dlx mcs install --username alice --perfil nextjs-prisma
+```
+
+`mcs` = **My Collec Skills**. Flags MVP: `--username` e `--perfil`.
+
+### Extensão de IDE (`mcs`)
+
+Extensão própria (Cursor-first, compatível com VS Code) para gerenciar sem sair do editor:
+
+- login GitHub / GitLab  
+- listar profiles e coleções (categoria → subcategoria)  
+- aplicar profile no workspace local  
+- ver o que já está aplicado vs pendente  
+- comandos na Command Palette (`MCS: Install Profile`, etc.)
+
+CLI e extensão compartilham o mesmo motor de apply e o manifesto do profile.
 
 ---
 
@@ -98,6 +128,8 @@ Estamos no início. Acompanhe o progresso aqui e nos commits.
 | Auth GitHub / GitLab | Pendente |
 | Conectores skills / docs / MCPs | Pendente |
 | Coleções por categoria | Pendente |
+| CLI `mcs install` | Pendente |
+| Extensão IDE `mcs` | Pendente |
 | Profiles + share + apply local | Pendente |
 
 Documentação de produto (quando existir): [`docs/PRD.md`](docs/PRD.md)
@@ -109,7 +141,7 @@ Documentação de produto (quando existir): [`docs/PRD.md`](docs/PRD.md)
 - Marketplace próprio avançado  
 - Monetização  
 - Sync multi-device  
-- Plugins nativos oficiais da IDE  
+- Extensões para JetBrains / Nova / Windsurf nesta fase  
 - SSO corporativo além de GitHub/GitLab  
 - Banco gerenciado em cloud nesta fase  
 
