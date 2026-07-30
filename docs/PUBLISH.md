@@ -31,33 +31,28 @@ Pacotes públicos do monorepo (registry npm — também consumíveis via **Bun**
 
 O `pnpm publish` substitui automaticamente `workspace:*` pelas versões publicadas.
 
-## Ordem de publicação
+## Publicação em lote (recomendada)
 
-Sempre nesta ordem (dependências primeiro):
-
-1. `my-collec-skills-manifest`
-2. `my-collec-skills-apply-engine`
-3. `my-collec-skills`
-
-### npm / pnpm (recomendado)
+O script da raiz usa o modo `--batch` do pnpm 11 para enviar os três
+pacotes em uma única requisição ao npm. Assim, a autenticação em duas
+etapas é solicitada apenas uma vez:
 
 ```bash
-# Dry-run (não envia)
-pnpm --filter my-collec-skills-manifest publish --dry-run --access public
-pnpm --filter my-collec-skills-apply-engine publish --dry-run --access public
-pnpm --filter my-collec-skills publish --dry-run --access public
+pnpm publish:packages:dry  # valida sem enviar
+pnpm publish:packages      # publica tudo com uma autenticação 2FA
+```
 
-# Publicar de verdade
+O `corepack` usa a versão de pnpm definida no `packageManager` da raiz.
+O batch é atômico: ou todos os pacotes são publicados, ou nenhum é.
+
+### Publicação individual (fallback)
+
+Se o registry não suportar batch, publique na ordem das dependências:
+
+```bash
 pnpm --filter my-collec-skills-manifest publish --access public
 pnpm --filter my-collec-skills-apply-engine publish --access public
 pnpm --filter my-collec-skills publish --access public
-```
-
-Atalho na raiz (após `pnpm build:packages`):
-
-```bash
-pnpm publish:packages:dry   # só dry-run
-pnpm publish:packages       # publica os três
 ```
 
 ### Bun
