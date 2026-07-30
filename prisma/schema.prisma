@@ -1,0 +1,255 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../generated"
+  importFileExtension = ""
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum CollectionType {
+  skill
+  agent
+  mcp
+}
+
+enum IdeTarget {
+  cursor
+  vscode
+}
+
+model User {
+  id            String         @id @default(cuid())
+  username      String         @unique
+  name          String?
+  email         String?        @unique
+  image         String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  oauthAccounts OAuthAccount[]
+  apiTokens     ApiToken[]
+  profiles      Profile[]
+  collections   Collection[]
+
+  @@index([username])
+}
+
+model ApiToken {
+  id         String    @id @default(cuid())
+  name       String
+  tokenHash  String    @unique
+  userId     String
+  expiresAt  DateTime?
+  lastUsedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model OAuthAccount {
+  id                String   @id @default(cuid())
+  userId            String
+  provider          String
+  providerAccountId String
+  accessToken       String?
+  refreshToken      String?
+  expiresAt         DateTime?
+  tokenType         String?
+  scope             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Category {
+  id            String        @id @default(cuid())
+  slug          String        @unique
+  name          String
+  description   String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  subcategories SubCategory[]
+  collections   Collection[]
+
+  @@index([slug])
+}
+
+model SubCategory {
+  id          String       @id @default(cuid())
+  slug        String
+  name        String
+  description String?
+  categoryId  String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  category    Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  collections Collection[]
+
+  @@unique([categoryId, slug])
+  @@index([categoryId])
+  @@index([slug])
+}
+
+model Collection {
+  id            String              @id @default(cuid())
+  name          String
+  description   String?
+  type          CollectionType
+  categoryId    String
+  subcategoryId String
+  ownerId       String
+  isPublic      Boolean             @default(false)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  category      Category            @relation(fields: [categoryId], references: [id])
+  subcategory   SubCategory         @relation(fields: [subcategoryId], references: [id])
+  owner         User                @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  items         CollectionItem[]
+  profiles      ProfileCollection[]
+
+  @@index([ownerId])
+  @@index([categoryId])
+  @@index([subcategoryId])
+  @@index([type])
+}
+
+model CollectionItem {
+  id           String     @id @default(cuid())
+  collectionId String
+  source       String
+  externalId   String
+  name         String
+  description  String?
+  metadata     Json?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@unique([collectionId, source, externalId])
+  @@index([collectionId])
+}
+
+model Profile {
+  id          String              @id @default(cuid())
+  slug        String
+  name        String
+  description String?
+  isPublic    Boolean             @default(false)
+  ownerId     String
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  owner       User                @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  collections ProfileCollection[]
+  skills      ProfileSkill[]
+  mcps        ProfileMcp[]
+  docs        ProfileDoc[]
+  agents      ProfileAgent[]
+  extensions  ProfileExtension[]
+
+  @@unique([ownerId, slug])
+  @@index([slug])
+  @@index([ownerId])
+  @@index([isPublic])
+}
+
+model ProfileCollection {
+  id           String     @id @default(cuid())
+  profileId    String
+  collectionId String
+  createdAt    DateTime   @default(now())
+  profile      Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, collectionId])
+  @@index([profileId])
+  @@index([collectionId])
+}
+
+model ProfileSkill {
+  id          String   @id @default(cuid())
+  profileId   String
+  source      String
+  externalId  String
+  name        String
+  description String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  profile     Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, source, externalId])
+  @@index([profileId])
+}
+
+model ProfileMcp {
+  id          String   @id @default(cuid())
+  profileId   String
+  source      String
+  externalId  String
+  name        String
+  description String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  profile     Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, source, externalId])
+  @@index([profileId])
+}
+
+model ProfileDoc {
+  id          String   @id @default(cuid())
+  profileId   String
+  source      String
+  externalId  String
+  name        String
+  url         String?
+  description String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  profile     Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, source, externalId])
+  @@index([profileId])
+}
+
+model ProfileAgent {
+  id          String   @id @default(cuid())
+  profileId   String
+  source      String
+  externalId  String
+  name        String
+  description String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  profile     Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, source, externalId])
+  @@index([profileId])
+}
+
+model ProfileExtension {
+  id          String    @id @default(cuid())
+  profileId   String
+  ide         IdeTarget
+  extensionId String
+  name        String
+  description String?
+  metadata    Json?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  profile     Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, ide, extensionId])
+  @@index([profileId])
+  @@index([ide])
+}

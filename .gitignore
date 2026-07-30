@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+
+# Environment / secrets
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Vercel project link (local)
+.vercel/
+
+# Prisma generated client
+/generated/
+prisma/*.db
+prisma/*.db-journal
+
+# Build / tooling
+dist/
+build/
+.next/
+.turbo/
+*.tsbuildinfo
+*.vsix
+coverage/
+
+# Local IDE / agent scratch (keep shared skills under .agents/)
+.cursor/
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*

@@ -1,0 +1,45 @@
+{
+  "name": "my-collec-skills",
+  "private": true,
+  "version": "0.0.0",
+  "description": "My Collec Skills — profiles, collections, CLI mcs e extensão IDE",
+  "packageManager": "pnpm@9.15.0",
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm db:generate && pnpm build:packages && pnpm --filter web build",
+    "build:packages": "pnpm --filter @mcs/manifest --filter @mcs/apply-engine --filter @mcs/cli build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm --filter web lint",
+    "test": "pnpm -r test",
+    "publish:packages:dry": "pnpm --filter @mcs/manifest --filter @mcs/apply-engine --filter @mcs/cli publish --dry-run --access public",
+    "publish:packages": "pnpm --filter @mcs/manifest publish --access public && pnpm --filter @mcs/apply-engine publish --access public && pnpm --filter @mcs/cli publish --access public",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:migrate": "prisma migrate dev",
+    "db:status": "prisma migrate status",
+    "db:generate": "prisma generate",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:studio": "prisma studio"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luizfilipeschaeffer/my-collec-skills.git"
+  },
+  "homepage": "https://github.com/luizfilipeschaeffer/my-collec-skills#readme",
+  "bugs": {
+    "url": "https://github.com/luizfilipeschaeffer/my-collec-skills/issues"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "dotenv": "^16.4.7",
+    "prisma": "^7.0.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.0.0",
+    "@prisma/client": "^7.0.0",
+    "pg": "^8.13.1"
+  }
+}

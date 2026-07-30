@@ -27,7 +27,7 @@ Falta um jeito leve de:
 | **Connectors** | Busca direta em bibliotecas de skills, docs e registries de MCPs |
 | **IDE extensions** | Extensões pré-selecionadas por IDE (Cursor / VS Code / JetBrains / Nova / windsurf) |
 | **Share + Apply** | Compartilhar perfil e aplicar no ambiente local |
-| **CLI `mcs`** | Install sem fricção: `mcs install --username <user> --perfil <slug>` |
+| **CLI `@mcs/cli`** | Install sem fricção: `npx @mcs/cli install --username <user> --perfil <slug>` |
 | **Extensão IDE `mcs`** | Painel na IDE para gerenciar skills/coleções/profiles e apply local |
 
 ### Coleções por categoria
@@ -39,11 +39,12 @@ O mesmo padrão vale para **skills**, **agents** e **MCPs**:
 3. Escolher **categoria → subcategoria** e agrupar em uma coleção  
 4. Anexar a coleção a um ou mais profiles  
 
-**Categorias iniciais (seed):** UI · UX · Accessibility · Database · Cybersecurity  
+**Categorias iniciais (seed, alinhadas a [skills.sh/topic](https://www.skills.sh/topic)):**  
+Frontend & React · Next.js · Design & UI · Mobile · Agent workflows · Databases · Testing · Marketing · Accessibility · Cybersecurity · MCP Integrations · Documentation  
 
-**Subcategorias (exemplos):** UI/Components · Database/Prisma · Cybersecurity/OWASP · Accessibility/WCAG  
+**Subcategorias (exemplos):** Databases/Prisma · Design & UI/Components · Cybersecurity/OWASP · MCP Integrations/Filesystem  
 
-*(extensíveis depois; mesma árvore para skills, agents e MCPs)*
+*(extensíveis; mesma árvore para skills, agents e MCPs)*
 
 ---
 
@@ -98,10 +99,15 @@ Montar Profile (+ extensões por IDE)
 Mesma mentalidade de `npm` / `pnpm` / `bun` / `yarn install` — um comando e o ambiente sobe:
 
 ```bash
-npx mcs install --username alice --perfil nextjs-prisma
-pnpm dlx mcs install --username alice --perfil nextjs-prisma
-bunx mcs install --username alice --perfil nextjs-prisma
-yarn dlx mcs install --username alice --perfil nextjs-prisma
+# Pacote npm: @mcs/cli (binário: mcs)
+# Evita colisão com o pacote npm "mcs" não relacionado.
+npx @mcs/cli install --username alice --perfil nextjs-prisma
+
+# Desenvolvimento local
+pnpm --filter @mcs/cli build
+node packages/cli/dist/bin.js install \
+  --username demo --perfil nextjs-prisma \
+  --api-url http://localhost:3000 --dry-run
 ```
 
 `mcs` = **My Collec Skills**. Flags MVP: `--username` e `--perfil`.
@@ -122,27 +128,29 @@ CLI e extensão compartilham o mesmo motor de apply e o manifesto do profile.
 
 ## Status do build (público)
 
-Estamos no início. Acompanhe o progresso aqui e nos commits.
+O MVP integrado está implementado e validado localmente.
 
 | Etapa | Status |
 | --- | --- |
-| Planejamento / PRD | Em andamento |
+| Planejamento / PRD | Feito — [`docs/PRD.md`](docs/PRD.md) |
 | Stack técnica (`docs/STACK.md`) | Feito |
 | README (build in public) | Feito |
-| Kanban de features (`.devtool/features/`) | Pendente |
-| Docker + Postgres + Prisma (schema inicial) | Pendente |
-| UI shadcn | Pendente |
-| Auth GitHub / GitLab | Pendente |
-| Conectores skills / docs / MCPs | Pendente |
-| Coleções por categoria | Pendente |
-| CLI `mcs install` | Pendente |
-| Extensão IDE `mcs` | Pendente |
-| Profiles + share + apply local | Pendente |
+| Kanban de features (`.devtool/features/`) | Feito |
+| Docker + Postgres + Prisma (schema inicial) | Feito |
+| UI shadcn | Feito |
+| Auth GitHub / GitLab | Feito (requer credenciais OAuth) |
+| Conectores skills / docs / MCPs | Feito (catálogo + MCP Registry) |
+| Coleções por categoria | Feito |
+| CLI `mcs install` | Feito |
+| Extensão IDE `mcs` | Feito (VSIX gerável) |
+| Profiles + share + apply local | Feito |
 
 Documentação:
 
+- Produto: [`docs/PRD.md`](docs/PRD.md)
 - Stack: [`docs/STACK.md`](docs/STACK.md)
-- Produto (quando existir): [`docs/PRD.md`](docs/PRD.md)
+- Publicar npm/Bun: [`docs/PUBLISH.md`](docs/PUBLISH.md)
+- Kanban: [`.devtool/features/`](.devtool/features/)
 
 ---
 
@@ -159,20 +167,52 @@ Documentação:
 
 ## Desenvolvimento local
 
-> Em breve: `docker compose up`, `DATABASE_URL` e migrations Prisma.
-
-Pré-requisitos previstos:
+Pré-requisitos:
 
 - Docker  
-- Node.js  
-- Conta GitHub e/ou GitLab (para auth, quando existir)
+- Node.js (LTS 20+)  
+- Conta GitHub e/ou GitLab (para OAuth fora do modo demo)
 
 ```bash
-# (ainda não disponível — será preenchido no bootstrap)
-# docker compose up -d
-# cp .env.example .env
-# npx prisma migrate dev
+# 1. Subir Postgres
+docker compose up -d
+
+# 2. Configurar env (PowerShell: Copy-Item)
+cp .env.example .env
+cp apps/web/.env.example apps/web/.env.local
+
+# 3. Instalar, migrar, gerar client e popular dados demo
+pnpm install
+pnpm db:migrate
+pnpm db:generate
+pnpm db:seed
+
+# 4. Iniciar a aplicação
+pnpm dev
 ```
+
+Acesse `http://localhost:3000`. O modo demo usa `demo/nextjs-prisma`; para OAuth real, preencha `AUTH_GITHUB_*` e/ou `AUTH_GITLAB_*` em `apps/web/.env.local` e desative `MCS_DEMO_MODE`.
+
+### Verificação
+
+```bash
+pnpm test
+pnpm typecheck
+pnpm lint
+pnpm build
+pnpm db:status
+
+# CLI contra a API local
+pnpm --filter @mcs/cli build
+node packages/cli/dist/bin.js install \
+  --username demo --perfil nextjs-prisma \
+  --api-url http://localhost:3000 --dry-run
+
+# Extensão instalável
+pnpm --filter mcs-extension package
+```
+
+Detalhes: [`packages/cli`](packages/cli), [`packages/apply-engine`](packages/apply-engine), [`packages/manifest`](packages/manifest) e [`apps/extension`](apps/extension).
 
 ---
 
@@ -184,12 +224,10 @@ Este repositório é construído em aberto:
 - features entram no kanban do projeto  
 - commits e PRs contam a história do MVP  
 
-Sugestões, issues e feedback são bem-vindos.
+Sugestões, issues e feedback são bem-vindos. Veja também [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 
 ---
 
 ## Licença
 
-Proprietary — All Rights Reserved.
-
-© 2026 My Collec Skills.
+[MIT](./LICENSE) © 2026 My Collec Skills contributors.

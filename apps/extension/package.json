@@ -1,0 +1,139 @@
+{
+  "name": "mcs-extension",
+  "displayName": "My Collec Skills",
+  "description": "Gerencie e aplique profiles MCS (skills, agents, MCPs) no workspace — Cursor / VS Code.",
+  "version": "0.1.0",
+  "publisher": "my-collec-skills",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/my-collec-skills/my-collec-skills"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "mcs",
+    "skills",
+    "cursor",
+    "mcp",
+    "profile"
+  ],
+  "activationEvents": [
+    "onView:mcs.sidebar",
+    "onCommand:mcs.installProfile",
+    "onCommand:mcs.manageCollections",
+    "onCommand:mcs.login",
+    "onCommand:mcs.logout",
+    "onCommand:mcs.refresh"
+  ],
+  "main": "./dist/extension.cjs",
+  "contributes": {
+    "configuration": {
+      "title": "My Collec Skills",
+      "properties": {
+        "mcs.apiUrl": {
+          "type": "string",
+          "default": "http://localhost:3000",
+          "description": "Base URL da Profile API MCS (sem barra final)."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "mcs.installProfile",
+        "title": "MCS: Install Profile",
+        "icon": "$(cloud-download)"
+      },
+      {
+        "command": "mcs.manageCollections",
+        "title": "MCS: Manage Collections",
+        "icon": "$(library)"
+      },
+      {
+        "command": "mcs.login",
+        "title": "MCS: Login",
+        "icon": "$(sign-in)"
+      },
+      {
+        "command": "mcs.logout",
+        "title": "MCS: Logout",
+        "icon": "$(sign-out)"
+      },
+      {
+        "command": "mcs.refresh",
+        "title": "MCS: Refresh",
+        "icon": "$(refresh)"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "mcs",
+          "title": "MCS",
+          "icon": "media/mcs.svg"
+        }
+      ]
+    },
+    "views": {
+      "mcs": [
+        {
+          "id": "mcs.sidebar",
+          "name": "Profiles & Collections"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "mcs.refresh",
+          "when": "view == mcs.sidebar",
+          "group": "navigation@1"
+        },
+        {
+          "command": "mcs.installProfile",
+          "when": "view == mcs.sidebar",
+          "group": "navigation@2"
+        },
+        {
+          "command": "mcs.login",
+          "when": "view == mcs.sidebar",
+          "group": "navigation@3"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "mcs.refresh",
+          "when": "true"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "watch": "node esbuild.mjs --watch",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "package": "pnpm run build && vsce package --no-dependencies",
+    "vscode:prepublish": "pnpm run build"
+  },
+  "dependencies": {
+    "@mcs/apply-engine": "workspace:*",
+    "@mcs/manifest": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.2.1",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.7.2",
+    "vitest": "^3.0.5"
+  }
+}

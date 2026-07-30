@@ -1,0 +1,15 @@
+export {
+  runInstall,
+  fetchManifest,
+  validateManifest,
+  formatReport,
+  resolveApiUrl,
+  InstallError,
+  EXIT_OK,
+  EXIT_USAGE,
+  EXIT_NETWORK,
+  EXIT_VALIDATION,
+  EXIT_APPLY,
+} from "./install.js";
+export type { InstallOptions } from "./install.js";
+export { main, runCli } from "./cli.js";

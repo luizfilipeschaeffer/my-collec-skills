@@ -199,8 +199,8 @@ Sem email/senha próprio no MVP. Sem SSO corporativo além desses providers.
 ### Distribuição
 
 ```bash
-npx mcs install --username <user> --perfil <slug>
-pnpm dlx mcs install --username <user> --perfil <slug>
+npx @mcs/cli install --username <user> --perfil <slug>
+pnpm dlx @mcs/cli install --username <user> --perfil <slug>
 bunx mcs install --username <user> --perfil <slug>
 yarn dlx mcs install --username <user> --perfil <slug>
 ```
@@ -289,7 +289,7 @@ API ──► Manifest JSON ──► @mcs/manifest (parse/validate)
 │             │◄───────────────│  Route Handlers  │
 └──────┬──────┘                └────────┬─────────┘
        │                                │
-       │ npx mcs / Open in IDE          │ Prisma
+       │ npx @mcs/cli / Open in IDE        │ Prisma
        ▼                                ▼
 ┌──────────────┐                 ┌──────────────┐
 │ packages/cli │                 │  PostgreSQL  │
@@ -363,7 +363,7 @@ Qualquer troca deve atualizar este documento e o README na mesma mudança.
 ## Referências
 
 - [README](../README.md) — visão do produto e status do build
-- [PRD (plano)](../prd_my_collec_skills.plan.md) — decisões de produto e domínio
+- [PRD](./PRD.md) — decisões de produto e domínio
 - [shadcn/ui](https://ui.shadcn.com)
 - [Auth.js](https://authjs.dev)
 - [Prisma](https://www.prisma.io)
