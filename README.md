@@ -180,4 +180,6 @@ Sugestões, issues e feedback são bem-vindos.
 
 ## Licença
 
-A definir.
+Proprietary — All Rights Reserved.
+
+© 2026 My Collec Skills.
