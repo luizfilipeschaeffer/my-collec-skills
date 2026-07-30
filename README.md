@@ -110,7 +110,7 @@ node packages/cli/dist/bin.js install \
   --api-url http://localhost:3000 --dry-run
 ```
 
-Em terminal interativo, a CLI pergunta qual IDE deve receber o profile (`Cursor` ou `VS Code`). Em CI/agentes, passe `--ide cursor|vscode`.
+Em terminal interativo, a CLI pergunta qual IDE deve receber o profile (`Cursor`, `VS Code` ou `Ambos`). Em CI/agentes, passe `--ide cursor|vscode|both`.
 
 `mcs` = **My Collec Skills**. Flags MVP: `--username` e `--perfil`.
 

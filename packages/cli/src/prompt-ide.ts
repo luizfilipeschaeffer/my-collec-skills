@@ -1,10 +1,10 @@
 import { createInterface } from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
-import type { IdeTarget } from "my-collec-skills-manifest";
+import type { IdeApplyTarget } from "my-collec-skills-apply-engine";
 import { InstallError } from "./install.js";
 
 const IDE_CHOICES: ReadonlyArray<{
-  value: IdeTarget;
+  value: IdeApplyTarget;
   keys: readonly string[];
   label: string;
   hint: string;
@@ -20,6 +20,12 @@ const IDE_CHOICES: ReadonlyArray<{
     keys: ["2", "vscode", "vs code", "code"],
     label: "VS Code",
     hint: ".github/skills · .github/agents · .vscode/mcp.json",
+  },
+  {
+    value: "both",
+    keys: ["3", "both", "ambos", "all"],
+    label: "Ambos",
+    hint: "Cursor + VS Code (layouts dos dois)",
   },
 ];
 
@@ -37,13 +43,13 @@ export function isInteractiveTerminal(
  * - Non-interactive (CI/agents): default to `cursor`.
  */
 export async function resolveIdeTarget(
-  explicit: IdeTarget | undefined,
+  explicit: IdeApplyTarget | undefined,
   options: {
     interactive?: boolean;
     /** Injectable for tests. */
-    prompt?: () => Promise<IdeTarget>;
+    prompt?: () => Promise<IdeApplyTarget>;
   } = {},
-): Promise<IdeTarget> {
+): Promise<IdeApplyTarget> {
   if (explicit) return explicit;
 
   const interactive = options.interactive ?? isInteractiveTerminal();
@@ -60,7 +66,7 @@ export async function resolveIdeTarget(
 
 export async function promptIdeTarget(
   io: { input?: NodeJS.ReadableStream; output?: NodeJS.WritableStream } = {},
-): Promise<IdeTarget> {
+): Promise<IdeApplyTarget> {
   const out = io.output ?? output;
   const streamIn = io.input ?? input;
   const rl = createInterface({
@@ -81,24 +87,28 @@ export async function promptIdeTarget(
     for (let attempt = 0; attempt < 5; attempt += 1) {
       let raw: string;
       try {
-        raw = (await rl.question("Escolha [1/2]: ")).trim().toLowerCase();
+        raw = (await rl.question("Escolha [1/2/3]: ")).trim().toLowerCase();
       } catch {
         throw new InstallError(
-          "Seleção de IDE interrompida. Passe --ide cursor|vscode.",
+          "Seleção de IDE interrompida. Passe --ide cursor|vscode|both.",
           1,
         );
       }
       if (!raw) {
-        out.write("Opção inválida. Digite 1 (Cursor) ou 2 (VS Code).\n");
+        out.write(
+          "Opção inválida. Digite 1 (Cursor), 2 (VS Code) ou 3 (Ambos).\n",
+        );
         continue;
       }
       const match = IDE_CHOICES.find((c) => c.keys.includes(raw));
       if (match) return match.value;
-      out.write("Opção inválida. Digite 1 (Cursor) ou 2 (VS Code).\n");
+      out.write(
+        "Opção inválida. Digite 1 (Cursor), 2 (VS Code) ou 3 (Ambos).\n",
+      );
     }
 
     throw new InstallError(
-      "Não foi possível selecionar a IDE. Passe --ide cursor|vscode.",
+      "Não foi possível selecionar a IDE. Passe --ide cursor|vscode|both.",
       1,
     );
   } finally {

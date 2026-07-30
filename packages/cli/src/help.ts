@@ -5,7 +5,7 @@
 
 export const CLI_NAME = "mcs";
 export const PACKAGE_NAME = "my-collec-skills";
-export const CLI_VERSION = "0.1.1";
+export const CLI_VERSION = "0.1.2";
 
 export function getHelpText(): string {
   return `
@@ -35,7 +35,7 @@ INSTALL
     --api-url <url>     API base URL (default: env MCS_API_URL or http://localhost:3000)
     --dry-run           Validate and report without writing files
     --force             Overwrite existing files when content differs
-    --ide <target>      Target IDE: cursor | vscode
+    --ide <target>      Target IDE: cursor | vscode | both
                         If omitted in a TTY, you will be asked to choose.
                         Non-interactive runs default to cursor.
 
@@ -51,9 +51,9 @@ EXAMPLES
   npx ${PACKAGE_NAME} install --username alice --perfil nextjs-prisma \\
     --api-url https://your-mcs-app.example.com
 
-  # Skip the prompt and target VS Code layout explicitly
+  # Skip the prompt and target both IDE layouts
   bunx ${PACKAGE_NAME} install --username alice --perfil nextjs-prisma \\
-    --force --ide vscode
+    --force --ide both
 
 WHAT IT DOES
   1. Asks which IDE should receive the profile (unless --ide is set)
@@ -71,9 +71,12 @@ WHAT IT DOES
        agents  → .github/agents/<id>.md
        mcps    → .vscode/mcp.json (safe merge)
 
-     Both:
+     Ambos (--ide both):
+       aplica os layouts Cursor e VS Code acima
+
+     Sempre:
        docs    → .mcs/docs.json
-       extensions → reported for the selected IDE (not auto-installed)
+       extensions → reported for the selected IDE(s) (not auto-installed)
 
 ENVIRONMENT
   MCS_API_URL   Base URL of the My Collec Skills API (no trailing slash required)
@@ -89,7 +92,7 @@ FOR AI AGENTS
   - Prefer: npx ${PACKAGE_NAME} … or bunx ${PACKAGE_NAME} … (do not use bare "npx mcs";
     the npm package name "mcs" is unrelated).
   - Always pass --username and --perfil.
-  - Pass --ide cursor|vscode in non-interactive contexts (CI / agents) to skip the prompt.
+  - Pass --ide cursor|vscode|both in non-interactive contexts (CI / agents) to skip the prompt.
   - Use --dry-run first when unsure about workspace writes.
   - Default API is localhost:3000; set --api-url or MCS_API_URL for deployed apps.
   - Idempotent apply: re-running skips identical content unless --force.

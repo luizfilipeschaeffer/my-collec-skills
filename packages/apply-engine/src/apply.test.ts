@@ -165,6 +165,80 @@ describe("applyProfile — happy path", () => {
       ),
     ).toBe(true);
   });
+
+  it("writes both Cursor and VS Code layouts when ide is both", async () => {
+    const cwd = await makeCwd();
+    const manifest = baseManifest({
+      skills: [
+        {
+          source: "local",
+          externalId: "shared-skill",
+          name: "Shared",
+          content: "# Shared\n",
+        },
+      ],
+      mcps: [
+        {
+          source: "registry",
+          externalId: "filesystem",
+          name: "Filesystem",
+          server: { command: "npx" },
+        },
+      ],
+      docs: [
+        {
+          source: "web",
+          externalId: "docs",
+          name: "Docs",
+          url: "https://example.com",
+        },
+      ],
+      extensions: [
+        { ide: "cursor", id: "cursor.ext", name: "Cursor Ext" },
+        { ide: "vscode", id: "vscode.ext", name: "VS Code Ext" },
+      ],
+    });
+
+    const report = await applyProfile(manifest, { cwd, ide: "both" });
+    expect(report.failed).toHaveLength(0);
+
+    expect(
+      await readFile(
+        path.join(cwd, ".cursor", "skills", "shared-skill", "SKILL.md"),
+        "utf8",
+      ),
+    ).toBe("# Shared\n");
+    expect(
+      await readFile(
+        path.join(cwd, ".github", "skills", "shared-skill", "SKILL.md"),
+        "utf8",
+      ),
+    ).toBe("# Shared\n");
+
+    const cursorMcp = JSON.parse(
+      await readFile(path.join(cwd, ".cursor", "mcp.json"), "utf8"),
+    );
+    const vscodeMcp = JSON.parse(
+      await readFile(path.join(cwd, ".vscode", "mcp.json"), "utf8"),
+    );
+    expect(cursorMcp.mcpServers.filesystem.command).toBe("npx");
+    expect(vscodeMcp.mcpServers.filesystem.command).toBe("npx");
+
+    const docs = JSON.parse(
+      await readFile(path.join(cwd, ".mcs", "docs.json"), "utf8"),
+    );
+    expect(docs.docs).toHaveLength(1);
+
+    const extCommands = report.applied
+      .filter((r) => r.kind === "extension")
+      .map((r) => r.command);
+    expect(extCommands).toEqual(
+      expect.arrayContaining([
+        "cursor --install-extension cursor.ext",
+        "code --install-extension vscode.ext",
+      ]),
+    );
+  });
 });
 
 describe("applyProfile — dry-run", () => {

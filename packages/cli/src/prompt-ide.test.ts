@@ -47,11 +47,13 @@ describe("promptIdeTarget", () => {
   }
 
   it("accepts numbered and named choices", async () => {
-    const cases: Array<{ input: string; expected: "cursor" | "vscode" }> = [
+    const cases: Array<{ input: string; expected: "cursor" | "vscode" | "both" }> = [
       { input: "1\n", expected: "cursor" },
       { input: "cursor\n", expected: "cursor" },
       { input: "2\n", expected: "vscode" },
       { input: "vscode\n", expected: "vscode" },
+      { input: "3\n", expected: "both" },
+      { input: "ambos\n", expected: "both" },
     ];
 
     for (const { input, expected } of cases) {

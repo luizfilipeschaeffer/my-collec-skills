@@ -1,4 +1,5 @@
 import type { IdeTarget } from "my-collec-skills-manifest";
+import type { IdeApplyTarget } from "./types.js";
 
 /**
  * Workspace layout for skills / agents / MCP config per IDE target.
@@ -33,4 +34,9 @@ const LAYOUTS: Record<IdeTarget, IdeLayout> = {
 
 export function getIdeLayout(ide: IdeTarget): IdeLayout {
   return LAYOUTS[ide];
+}
+
+/** Expand an apply choice into concrete IDE targets. */
+export function expandIdeTargets(ide: IdeApplyTarget): IdeTarget[] {
+  return ide === "both" ? ["cursor", "vscode"] : [ide];
 }

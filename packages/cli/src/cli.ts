@@ -1,20 +1,20 @@
 import { defineCommand, runMain } from "citty";
-import type { IdeTarget } from "my-collec-skills-manifest";
+import type { IdeApplyTarget } from "my-collec-skills-apply-engine";
 import { CLI_NAME, CLI_VERSION, PACKAGE_NAME, printHelp } from "./help.js";
 import { InstallError, runInstall } from "./install.js";
 import { resolveIdeTarget } from "./prompt-ide.js";
 
-const ideValues = new Set<IdeTarget>(["cursor", "vscode"]);
+const ideValues = new Set<IdeApplyTarget>(["cursor", "vscode", "both"]);
 
-function parseIde(value: string | undefined): IdeTarget | undefined {
+function parseIde(value: string | undefined): IdeApplyTarget | undefined {
   if (!value) return undefined;
-  if (!ideValues.has(value as IdeTarget)) {
+  if (!ideValues.has(value as IdeApplyTarget)) {
     throw new InstallError(
-      `Invalid --ide "${value}". Use cursor or vscode.`,
+      `Invalid --ide "${value}". Use cursor, vscode, or both.`,
       1,
     );
   }
-  return value as IdeTarget;
+  return value as IdeApplyTarget;
 }
 
 const installCommand = defineCommand({
@@ -51,7 +51,7 @@ const installCommand = defineCommand({
     ide: {
       type: "string",
       description:
-        "Target IDE: cursor | vscode (prompts interactively when omitted)",
+        "Target IDE: cursor | vscode | both (prompts interactively when omitted)",
     },
   },
   async run({ args }) {

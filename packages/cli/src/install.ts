@@ -1,6 +1,6 @@
-import type { ApplyReport } from "my-collec-skills-apply-engine";
+import type { ApplyReport, IdeApplyTarget } from "my-collec-skills-apply-engine";
 import { applyProfile } from "my-collec-skills-apply-engine";
-import type { IdeTarget, ProfileManifest } from "my-collec-skills-manifest";
+import type { ProfileManifest } from "my-collec-skills-manifest";
 import {
   ManifestValidationError,
   parseProfileManifest,
@@ -18,7 +18,7 @@ export interface InstallOptions {
   apiUrl?: string;
   dryRun?: boolean;
   force?: boolean;
-  ide?: IdeTarget;
+  ide?: IdeApplyTarget;
   cwd?: string;
   /** Injectable fetch for tests. */
   fetchImpl?: typeof fetch;

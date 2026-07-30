@@ -9,6 +9,9 @@ export type ApplyItemKind =
   | "doc"
   | "extension";
 
+/** Where to write skills/agents/MCPs: one IDE or both layouts. */
+export type IdeApplyTarget = IdeTarget | "both";
+
 export interface ApplyItemResult {
   kind: ApplyItemKind;
   id: string;
@@ -29,8 +32,11 @@ export interface ApplyReport {
 export interface ApplyOptions {
   /** Workspace root. Defaults to process.cwd(). */
   cwd?: string;
-  /** Target IDE; selects workspace layout and filters extensions. Defaults to "cursor". */
-  ide?: IdeTarget;
+  /**
+   * Target IDE layout(s). Defaults to "cursor".
+   * Use "both" to apply Cursor and VS Code layouts in one run.
+   */
+  ide?: IdeApplyTarget;
   /** Plan only — no filesystem writes. */
   dryRun?: boolean;
   /** Overwrite existing differing content. */

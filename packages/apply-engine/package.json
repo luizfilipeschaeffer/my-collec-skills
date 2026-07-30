@@ -1,6 +1,6 @@
 {
   "name": "my-collec-skills-apply-engine",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Apply a validated MCS Profile Manifest to a local workspace",
   "type": "module",
   "main": "./dist/index.js",

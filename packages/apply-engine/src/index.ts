@@ -1,5 +1,5 @@
 export { applyProfile } from "./apply.js";
-export { getIdeLayout } from "./layout.js";
+export { expandIdeTargets, getIdeLayout } from "./layout.js";
 export { assertSafeId, resolveSafePath } from "./paths.js";
 export { collectAgents, collectMcps, collectSkills } from "./collect.js";
 
@@ -10,5 +10,6 @@ export type {
   ApplyItemResult,
   ApplyReport,
   ApplyOptions,
+  IdeApplyTarget,
   ProfileManifest,
 } from "./types.js";

@@ -2,12 +2,13 @@ import path from "node:path";
 import type { CatalogItem, DocItem, IdeTarget, McpItem, ProfileManifest } from "my-collec-skills-manifest";
 import { collectAgents, collectMcps, collectSkills } from "./collect.js";
 import { readFileIfExists, writeFileAtomic } from "./fs.js";
-import { getIdeLayout, type IdeLayout } from "./layout.js";
+import { expandIdeTargets, getIdeLayout, type IdeLayout } from "./layout.js";
 import { assertSafeId, resolveSafePath } from "./paths.js";
 import type {
   ApplyItemResult,
   ApplyOptions,
   ApplyReport,
+  IdeApplyTarget,
 } from "./types.js";
 
 interface Ctx {
@@ -313,16 +314,21 @@ async function applyDocs(ctx: Ctx, items: DocItem[]): Promise<void> {
 }
 
 function applyExtensions(
-  ctx: Ctx,
+  results: ApplyItemResult[],
+  dryRun: boolean,
+  targets: IdeTarget[],
   extensions: ProfileManifest["extensions"],
 ): void {
+  const allowed = new Set(targets);
+  const targetLabel = targets.join("+");
+
   for (const ext of extensions) {
-    if (ext.ide !== ctx.ide) {
-      push(ctx, {
+    if (!allowed.has(ext.ide)) {
+      results.push({
         kind: "extension",
         id: ext.id,
         status: "skipped",
-        message: `Target IDE is ${ctx.ide}; extension is for ${ext.ide}`,
+        message: `Target IDE is ${targetLabel}; extension is for ${ext.ide}`,
       });
       continue;
     }
@@ -332,11 +338,11 @@ function applyExtensions(
         ? `code --install-extension ${ext.id}`
         : `cursor --install-extension ${ext.id}`;
 
-    push(ctx, {
+    results.push({
       kind: "extension",
       id: ext.id,
       status: "applied",
-      message: ctx.dryRun
+      message: dryRun
         ? `Would report install command for ${ext.name}`
         : `Install manually: ${ext.name}`,
       command,
@@ -357,33 +363,60 @@ function toReport(ctx: Ctx): ApplyReport {
   };
 }
 
+function makeCtx(
+  cwd: string,
+  ide: IdeTarget,
+  dryRun: boolean,
+  force: boolean,
+  results: ApplyItemResult[],
+): Ctx {
+  return {
+    cwd,
+    ide,
+    layout: getIdeLayout(ide),
+    dryRun,
+    force,
+    results,
+  };
+}
+
 /**
  * Apply a validated Profile Manifest to the local workspace.
  * Idempotent: identical content is skipped; differing content requires `force`.
+ * With `ide: "both"`, skills/agents/MCPs/extensions are applied for Cursor and VS Code;
+ * docs (`.mcs/docs.json`) are written once.
  */
 export async function applyProfile(
   manifest: ProfileManifest,
   options: ApplyOptions = {},
 ): Promise<ApplyReport> {
-  const ide = options.ide ?? "cursor";
-  const ctx: Ctx = {
-    cwd: path.resolve(options.cwd ?? process.cwd()),
-    ide,
-    layout: getIdeLayout(ide),
-    dryRun: options.dryRun ?? false,
-    force: options.force ?? false,
-    results: [],
-  };
+  const choice: IdeApplyTarget = options.ide ?? "cursor";
+  const targets = expandIdeTargets(choice);
+  const cwd = path.resolve(options.cwd ?? process.cwd());
+  const dryRun = options.dryRun ?? false;
+  const force = options.force ?? false;
+  const results: ApplyItemResult[] = [];
 
-  for (const skill of collectSkills(manifest)) {
-    await applySkill(ctx, skill);
-  }
-  for (const agent of collectAgents(manifest)) {
-    await applyAgent(ctx, agent);
-  }
-  await applyMcps(ctx, collectMcps(manifest));
-  await applyDocs(ctx, manifest.docs);
-  applyExtensions(ctx, manifest.extensions);
+  const skills = collectSkills(manifest);
+  const agents = collectAgents(manifest);
+  const mcps = collectMcps(manifest);
 
-  return toReport(ctx);
+  for (const ide of targets) {
+    const ctx = makeCtx(cwd, ide, dryRun, force, results);
+    for (const skill of skills) {
+      await applySkill(ctx, skill);
+    }
+    for (const agent of agents) {
+      await applyAgent(ctx, agent);
+    }
+    await applyMcps(ctx, mcps);
+  }
+
+  applyExtensions(results, dryRun, targets, manifest.extensions);
+
+  // Docs are IDE-agnostic — apply once.
+  const docsCtx = makeCtx(cwd, targets[0]!, dryRun, force, results);
+  await applyDocs(docsCtx, manifest.docs);
+
+  return toReport(docsCtx);
 }
