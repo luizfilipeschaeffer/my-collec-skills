@@ -31,11 +31,14 @@ Pacotes públicos do monorepo (registry npm — também consumíveis via **Bun**
 
 O `pnpm publish` substitui automaticamente `workspace:*` pelas versões publicadas.
 
-## Publicação em lote (recomendada)
+## Publicação com um único OTP (recomendada)
 
-O script da raiz usa o modo `--batch` do pnpm 11 para enviar os três
-pacotes em uma única requisição ao npm. Assim, a autenticação em duas
-etapas é solicitada apenas uma vez:
+O registry oficial do npm não implementa publicação `--batch`. O script da
+raiz contorna as três autenticações sem reduzir a segurança:
+
+1. compila e testa os três pacotes;
+2. solicita um único código OTP novo;
+3. publica os três em sequência, reutilizando o código dentro da janela TOTP.
 
 ```bash
 pnpm publish:packages:dry  # valida sem enviar
@@ -43,7 +46,8 @@ pnpm publish:packages      # publica tudo com uma autenticação 2FA
 ```
 
 O `corepack` usa a versão de pnpm definida no `packageManager` da raiz.
-O batch é atômico: ou todos os pacotes são publicados, ou nenhum é.
+Para automação não interativa, o código também pode ser fornecido em
+`NPM_CONFIG_OTP`.
 
 ### Publicação individual (fallback)
 
