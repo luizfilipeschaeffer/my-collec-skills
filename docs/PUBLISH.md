@@ -45,9 +45,9 @@ pnpm publish:packages:dry  # valida sem enviar
 pnpm publish:packages      # publica tudo com uma autenticação 2FA
 ```
 
-O `corepack` usa a versão de pnpm definida no `packageManager` da raiz.
-Para automação não interativa, o código também pode ser fornecido em
-`NPM_CONFIG_OTP`.
+O fluxo usa pnpm 9, compatível com o lockfile atual, e não reinstala as
+dependências durante a publicação. Para automação não interativa, o código
+também pode ser fornecido em `NPM_CONFIG_OTP`.
 
 ### Publicação individual (fallback)
 

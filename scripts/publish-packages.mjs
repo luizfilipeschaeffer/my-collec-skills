@@ -12,7 +12,7 @@ const filters = [
 ];
 
 function run(args, options = {}) {
-  const result = spawnSync("corepack", ["pnpm", ...args], {
+  const result = spawnSync("pnpm", args, {
     cwd: process.cwd(),
     shell: process.platform === "win32",
     stdio: "inherit",
