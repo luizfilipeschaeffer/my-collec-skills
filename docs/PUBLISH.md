@@ -83,6 +83,10 @@ bun publish --cwd packages/cli --access public
 ## Consumo (após publicar)
 
 ```bash
+# Help (humano + IA)
+npx @mcs/cli help
+bunx @mcs/cli help
+
 # npm / pnpm / yarn
 npx @mcs/cli install --username alice --perfil nextjs-prisma
 pnpm dlx @mcs/cli install --username alice --perfil nextjs-prisma
@@ -97,6 +101,10 @@ Como dependência de biblioteca:
 pnpm add @mcs/manifest @mcs/apply-engine
 # ou
 bun add @mcs/manifest @mcs/apply-engine
+```
+
+```ts
+import { getHelpText, runInstall } from "@mcs/cli";
 ```
 
 ## Versionamento

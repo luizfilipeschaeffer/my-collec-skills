@@ -112,6 +112,13 @@ node packages/cli/dist/bin.js install \
 
 `mcs` = **My Collec Skills**. Flags MVP: `--username` e `--perfil`.
 
+Help completo (humano + IA):
+
+```bash
+npx @mcs/cli help
+bunx @mcs/cli help
+```
+
 ### Extensão de IDE (`mcs`)
 
 Extensão própria (Cursor-first, compatível com VS Code) para gerenciar sem sair do editor:
