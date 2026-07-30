@@ -57,7 +57,7 @@ export default async function Home() {
               <CardHeader>
                 <CardDescription>Instale em qualquer workspace</CardDescription>
                 <CardTitle className="font-mono text-base">
-                  npx @mcs/cli install --username demo --perfil nextjs-prisma
+                  npx my-collec-skills install --username demo --perfil nextjs-prisma
                 </CardTitle>
               </CardHeader>
               <CardContent className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">

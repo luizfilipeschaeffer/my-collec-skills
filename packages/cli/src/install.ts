@@ -1,10 +1,10 @@
-import type { ApplyReport } from "@mcs/apply-engine";
-import { applyProfile } from "@mcs/apply-engine";
-import type { IdeTarget, ProfileManifest } from "@mcs/manifest";
+import type { ApplyReport } from "my-collec-skills-apply-engine";
+import { applyProfile } from "my-collec-skills-apply-engine";
+import type { IdeTarget, ProfileManifest } from "my-collec-skills-manifest";
 import {
   ManifestValidationError,
   parseProfileManifest,
-} from "@mcs/manifest";
+} from "my-collec-skills-manifest";
 
 export const EXIT_OK = 0;
 export const EXIT_USAGE = 1;

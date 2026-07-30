@@ -1,5 +1,5 @@
 {
-  "name": "@mcs/cli",
+  "name": "my-collec-skills",
   "version": "0.1.0",
   "description": "My Collec Skills CLI — install profiles locally",
   "type": "module",
@@ -26,8 +26,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@mcs/apply-engine": "workspace:*",
-    "@mcs/manifest": "workspace:*",
+    "my-collec-skills-apply-engine": "workspace:*",
+    "my-collec-skills-manifest": "workspace:*",
     "citty": "^0.1.6"
   },
   "devDependencies": {

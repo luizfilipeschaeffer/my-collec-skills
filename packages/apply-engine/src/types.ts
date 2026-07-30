@@ -1,4 +1,4 @@
-import type { IdeTarget, ProfileManifest } from "@mcs/manifest";
+import type { IdeTarget, ProfileManifest } from "my-collec-skills-manifest";
 
 export type ApplyStatus = "applied" | "skipped" | "failed";
 

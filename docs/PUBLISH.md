@@ -1,20 +1,20 @@
-# Publicar packages (`@mcs/*`)
+# Publicar packages My Collec Skills
 
 Pacotes públicos do monorepo (registry npm — também consumíveis via **Bun**):
 
 | Package | Uso | Público |
 | --- | --- | --- |
-| `@mcs/manifest` | Schema Zod do Profile Manifest | Sim |
-| `@mcs/apply-engine` | Apply local do manifesto | Sim |
-| `@mcs/cli` | CLI (`mcs` / `npx @mcs/cli` / `bunx @mcs/cli`) | Sim |
+| `my-collec-skills-manifest` | Schema Zod do Profile Manifest | Sim |
+| `my-collec-skills-apply-engine` | Apply local do manifesto | Sim |
+| `my-collec-skills` | CLI (`mcs` / `npx my-collec-skills` / `bunx my-collec-skills`) | Sim |
 | `@mcs/db` | Cliente Prisma interno | Não (`private`) |
 | `web` / `mcs-extension` | Apps | Não (`private`) |
 
-> O nome curto `mcs` no npm já está ocupado. O pacote CLI é **`@mcs/cli`**; o binário instalado continua `mcs`.
+> O nome curto `mcs` no npm já está ocupado. O pacote CLI é **`my-collec-skills`**; o binário instalado continua `mcs`.
 
 ## Pré-requisitos
 
-1. Conta no [npm](https://www.npmjs.com/) e organização/scope **`@mcs`** (criar em npm → Organizations, ou pedir acesso).
+1. Conta no [npm](https://www.npmjs.com/) com permissão para publicar os nomes sem scope listados acima.
 2. Login local:
    ```bash
    npm login
@@ -35,22 +35,22 @@ O `pnpm publish` substitui automaticamente `workspace:*` pelas versões publicad
 
 Sempre nesta ordem (dependências primeiro):
 
-1. `@mcs/manifest`
-2. `@mcs/apply-engine`
-3. `@mcs/cli`
+1. `my-collec-skills-manifest`
+2. `my-collec-skills-apply-engine`
+3. `my-collec-skills`
 
 ### npm / pnpm (recomendado)
 
 ```bash
 # Dry-run (não envia)
-pnpm --filter @mcs/manifest publish --dry-run --access public
-pnpm --filter @mcs/apply-engine publish --dry-run --access public
-pnpm --filter @mcs/cli publish --dry-run --access public
+pnpm --filter my-collec-skills-manifest publish --dry-run --access public
+pnpm --filter my-collec-skills-apply-engine publish --dry-run --access public
+pnpm --filter my-collec-skills publish --dry-run --access public
 
 # Publicar de verdade
-pnpm --filter @mcs/manifest publish --access public
-pnpm --filter @mcs/apply-engine publish --access public
-pnpm --filter @mcs/cli publish --access public
+pnpm --filter my-collec-skills-manifest publish --access public
+pnpm --filter my-collec-skills-apply-engine publish --access public
+pnpm --filter my-collec-skills publish --access public
 ```
 
 Atalho na raiz (após `pnpm build:packages`):
@@ -84,27 +84,27 @@ bun publish --cwd packages/cli --access public
 
 ```bash
 # Help (humano + IA)
-npx @mcs/cli help
-bunx @mcs/cli help
+npx my-collec-skills help
+bunx my-collec-skills help
 
 # npm / pnpm / yarn
-npx @mcs/cli install --username alice --perfil nextjs-prisma
-pnpm dlx @mcs/cli install --username alice --perfil nextjs-prisma
+npx my-collec-skills install --username alice --perfil nextjs-prisma
+pnpm dlx my-collec-skills install --username alice --perfil nextjs-prisma
 
 # Bun
-bunx @mcs/cli install --username alice --perfil nextjs-prisma
+bunx my-collec-skills install --username alice --perfil nextjs-prisma
 ```
 
 Como dependência de biblioteca:
 
 ```bash
-pnpm add @mcs/manifest @mcs/apply-engine
+pnpm add my-collec-skills-manifest my-collec-skills-apply-engine
 # ou
-bun add @mcs/manifest @mcs/apply-engine
+bun add my-collec-skills-manifest my-collec-skills-apply-engine
 ```
 
 ```ts
-import { getHelpText, runInstall } from "@mcs/cli";
+import { getHelpText, runInstall } from "my-collec-skills";
 ```
 
 ## Versionamento
@@ -123,8 +123,8 @@ Hoje: `0.1.0` nos três packages. Antes de republicar:
 
 ## Checklist rápido
 
-- [ ] Scope `@mcs` existe e você tem permissão de publish
+- [ ] Os nomes dos packages continuam disponíveis e você está autenticado no npm
 - [ ] `pnpm build:packages` OK
 - [ ] dry-run sem erros
 - [ ] publish na ordem manifest → apply-engine → cli
-- [ ] `npx @mcs/cli --help` e `bunx @mcs/cli --help` funcionam
+- [ ] `npx my-collec-skills --help` e `bunx my-collec-skills --help` funcionam

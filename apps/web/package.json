@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@mcs/db": "workspace:^",
-    "@mcs/manifest": "workspace:^",
+    "my-collec-skills-manifest": "workspace:^",
     "@vercel/oidc": "^3.8.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

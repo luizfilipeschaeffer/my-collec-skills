@@ -1,5 +1,5 @@
 {
-  "name": "@mcs/apply-engine",
+  "name": "my-collec-skills-apply-engine",
   "version": "0.1.0",
   "description": "Apply a validated MCS Profile Manifest to a local workspace",
   "type": "module",
@@ -23,7 +23,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@mcs/manifest": "workspace:*"
+    "my-collec-skills-manifest": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

@@ -125,8 +125,8 @@
     "vscode:prepublish": "pnpm run build"
   },
   "dependencies": {
-    "@mcs/apply-engine": "workspace:*",
-    "@mcs/manifest": "workspace:*"
+    "my-collec-skills-apply-engine": "workspace:*",
+    "my-collec-skills-manifest": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

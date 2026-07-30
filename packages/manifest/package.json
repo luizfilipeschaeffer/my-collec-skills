@@ -1,5 +1,5 @@
 {
-  "name": "@mcs/manifest",
+  "name": "my-collec-skills-manifest",
   "version": "0.1.0",
   "description": "Zod schemas and types for MCS Profile Manifest v1",
   "type": "module",

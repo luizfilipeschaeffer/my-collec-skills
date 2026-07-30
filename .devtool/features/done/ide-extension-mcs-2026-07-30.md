@@ -20,7 +20,7 @@ Extensão Cursor/VS Code para gerenciar skills/coleções/profiles e apply local
 - Alvo MVP: Cursor (API VS Code)
 - Login GitHub/GitLab na extensão
 - Sidebar + Command Palette (`MCS: Install Profile`, `MCS: Manage Collections`)
-- Apply via `@mcs/apply-engine` + status aplicado vs pendente
+- Apply via `my-collec-skills-apply-engine` + status aplicado vs pendente
 
 ## Critérios de pronto
 

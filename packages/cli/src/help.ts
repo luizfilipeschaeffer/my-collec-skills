@@ -1,10 +1,10 @@
 /**
- * Help text for humans and AI agents using @mcs/cli.
+ * Help text for humans and AI agents using my-collec-skills.
  * Keep this file as the single source of truth for CLI usage docs.
  */
 
 export const CLI_NAME = "mcs";
-export const PACKAGE_NAME = "@mcs/cli";
+export const PACKAGE_NAME = "my-collec-skills";
 export const CLI_VERSION = "0.1.0";
 
 export function getHelpText(): string {
@@ -55,8 +55,8 @@ EXAMPLES
 
 WHAT IT DOES
   1. GET {api}/api/profiles/{username}/{slug}/manifest
-  2. Validates Profile Manifest v1 (@mcs/manifest)
-  3. Applies to the workspace via @mcs/apply-engine:
+  2. Validates Profile Manifest v1 (my-collec-skills-manifest)
+  3. Applies to the workspace via my-collec-skills-apply-engine:
        skills  → .cursor/skills/<id>/SKILL.md
        agents  → .cursor/agents/<id>.md
        mcps    → .cursor/mcp.json (safe merge)

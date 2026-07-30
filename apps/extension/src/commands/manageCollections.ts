@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { parseProfileManifest } from "@mcs/manifest";
+import { parseProfileManifest } from "my-collec-skills-manifest";
 import { fetchProfileManifest } from "../api/client.js";
 import type { SessionStore } from "../auth/session.js";
 import { getApiUrl } from "../config.js";

@@ -12,8 +12,8 @@ import {
   profileKey,
   upsertProfileStatus,
 } from "../status/workspaceStatus.js";
-import type { ApplyReport } from "@mcs/apply-engine";
-import type { ProfileManifest } from "@mcs/manifest";
+import type { ApplyReport } from "my-collec-skills-apply-engine";
+import type { ProfileManifest } from "my-collec-skills-manifest";
 
 describe("url helpers", () => {
   it("normalizes trailing slashes", () => {

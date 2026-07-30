@@ -73,7 +73,7 @@ export const CollectionSchema = z.object({
 export type ManifestCollection = z.infer<typeof CollectionSchema>;
 
 /**
- * Profile Manifest v1 — sole input contract for `@mcs/apply-engine`.
+ * Profile Manifest v1 — sole input contract for `my-collec-skills-apply-engine`.
  * @see docs/PRD.md §12
  */
 export const ProfileManifestSchema = z.object({

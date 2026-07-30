@@ -19,12 +19,12 @@ CLI publicável `mcs` com `mcs install --username --perfil` (UX tipo package-man
 
 - Pacote npm com bin `mcs`
 - Comando `install` (flags MVP: `--username`, `--perfil`)
-- Resolve manifesto na API → `@mcs/apply-engine`
+- Resolve manifesto na API → `my-collec-skills-apply-engine`
 - Feedback claro no terminal; uso via npx/pnpm dlx/bunx/yarn dlx
 
 ## Critérios de pronto
 
-- [x] `npx @mcs/cli install --username <u> --perfil <slug>` aplica profile público
+- [x] `npx my-collec-skills install --username <u> --perfil <slug>` aplica profile público
 - [x] Erros de rede/validação com exit codes estáveis
 - [x] Documentado no README e na página de share
 

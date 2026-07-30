@@ -13,7 +13,7 @@ order: "a4"
 
 # Domain profile manifesto
 
-Pacote `@mcs/manifest`: contrato JSON Zod do profile consumido pela CLI e pela extensão.
+Pacote `my-collec-skills-manifest`: contrato JSON Zod do profile consumido pela CLI e pela extensão.
 
 ## Escopo
 
@@ -23,7 +23,7 @@ Pacote `@mcs/manifest`: contrato JSON Zod do profile consumido pela CLI e pela e
 
 ## Critérios de pronto
 
-- [x] Pacote `@mcs/manifest` com schemas e tipos exportados
+- [x] Pacote `my-collec-skills-manifest` com schemas e tipos exportados
 - [x] Manifesto inclui collections tipadas com category + subcategory
 - [x] GET manifesto por username/slug documentado
 

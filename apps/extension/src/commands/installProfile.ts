@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
-import { applyProfile, type ApplyReport } from "@mcs/apply-engine";
-import { parseProfileManifest, type ProfileManifest } from "@mcs/manifest";
+import { applyProfile, type ApplyReport } from "my-collec-skills-apply-engine";
+import { parseProfileManifest, type ProfileManifest } from "my-collec-skills-manifest";
 import { fetchProfileManifest } from "../api/client.js";
 import type { SessionStore } from "../auth/session.js";
 import {

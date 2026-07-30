@@ -2,7 +2,7 @@ import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import type { ProfileManifest } from "@mcs/manifest";
+import type { ProfileManifest } from "my-collec-skills-manifest";
 import { applyProfile } from "./apply.js";
 import { assertSafeId, resolveSafePath } from "./paths.js";
 

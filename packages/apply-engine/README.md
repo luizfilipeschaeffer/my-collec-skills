@@ -1,12 +1,12 @@
-# `@mcs/apply-engine`
+# `my-collec-skills-apply-engine`
 
 Aplica um **Profile Manifest** validado no workspace local (idempotente).
 
 ## Uso
 
 ```ts
-import { applyProfile } from "@mcs/apply-engine";
-import { parseProfileManifest } from "@mcs/manifest";
+import { applyProfile } from "my-collec-skills-apply-engine";
+import { parseProfileManifest } from "my-collec-skills-manifest";
 
 const manifest = parseProfileManifest(json);
 const report = await applyProfile(manifest, {

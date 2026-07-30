@@ -2,7 +2,7 @@ import type {
   CatalogItem,
   McpItem,
   ProfileManifest,
-} from "@mcs/manifest";
+} from "my-collec-skills-manifest";
 
 export function collectSkills(manifest: ProfileManifest): CatalogItem[] {
   const fromCollections = manifest.collections

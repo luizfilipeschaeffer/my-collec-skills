@@ -32,7 +32,7 @@ export default async function ShareProfilePage({ params }: Props) {
   const { username, slug } = await params;
   const manifest = await resolveProfileManifest(username, slug);
   if (!manifest) notFound();
-  const command = `npx @mcs/cli install --username ${username} --perfil ${slug}`;
+  const command = `npx my-collec-skills install --username ${username} --perfil ${slug}`;
 
   return (
     <div className="min-h-screen">

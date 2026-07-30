@@ -19,11 +19,11 @@ pnpm lint
 - Preferir mudanças pequenas e focadas
 - Não commitar `.env`, `.env.local`, `.vercel/` ou tokens
 - Documentar decisões relevantes em `docs/` ou no kanban `.devtool/features/`
-- CLI público: pacote `@mcs/cli` (binário `mcs`) — não use o pacote npm `mcs` não relacionado
+- CLI público: pacote `my-collec-skills` (binário `mcs`) — não use o pacote npm `mcs` não relacionado
 
 ## Publicar no npm / Bun
 
-Os packages `@mcs/manifest`, `@mcs/apply-engine` e `@mcs/cli` são públicos.
+Os packages `my-collec-skills-manifest`, `my-collec-skills-apply-engine` e `my-collec-skills` são públicos.
 Guia completo: [`docs/PUBLISH.md`](./docs/PUBLISH.md).
 
 ```bash
@@ -32,7 +32,7 @@ pnpm publish:packages:dry   # validar
 # pnpm publish:packages     # quando for a hora
 ```
 
-Consumo com Bun (mesmo registry): `bunx @mcs/cli …` / `bun add @mcs/manifest`.
+Consumo com Bun (mesmo registry): `bunx my-collec-skills …` / `bun add my-collec-skills-manifest`.
 
 ## Issues e feedback
 

@@ -10,7 +10,7 @@ Documento de decisão da stack do MVP. Complementa o [PRD](./PRD.md) (quando exi
 ## 1. Princípios
 
 1. **Um ecossistema TypeScript** — web, CLI, extensão IDE e motor de apply compartilham tipos e runtime.
-2. **Reúso do apply** — CLI e extensão consomem o mesmo `@mcs/apply-engine` e o mesmo contrato `@mcs/manifest`.
+2. **Reúso do apply** — CLI e extensão consomem o mesmo `my-collec-skills-apply-engine` e o mesmo contrato `my-collec-skills-manifest`.
 3. **Decisões fechadas do produto** — UI 100% shadcn/ui, auth OAuth GitHub/GitLab, Postgres local via Docker + Prisma, Cursor-first.
 4. **MVP enxuto** — preferir bibliotecas oficiais/padrão do ecossistema Next.js; evitar frameworks paralelos de UI ou ORMs concorrentes.
 
@@ -28,8 +28,8 @@ Documento de decisão da stack do MVP. Complementa o [PRD](./PRD.md) (quando exi
 | Banco | **Docker + PostgreSQL + Prisma** | Persistência local do domínio (User, Profile, Collection, …) |
 | CLI `mcs` | **TypeScript + citty** (ou commander) | `mcs install --username --perfil`; publicável no npm |
 | Extensão IDE | **VS Code Extension API** (Cursor-first) | Painel + Command Palette; apply sem sair do editor |
-| Núcleo crítico | **`@mcs/apply-engine`** | Manifesto → apply no workspace local |
-| Tipos/contrato | **`@mcs/manifest`** (Zod schemas) | Fonte de verdade do Profile Manifest |
+| Núcleo crítico | **`my-collec-skills-apply-engine`** | Manifesto → apply no workspace local |
+| Tipos/contrato | **`my-collec-skills-manifest`** (Zod schemas) | Fonte de verdade do Profile Manifest |
 
 ### Linguagem e runtime
 
@@ -53,8 +53,8 @@ my-collec-skills/
 │   └── extension/           # Extensão Cursor / VS Code
 ├── packages/
 │   ├── cli/                 # Binário `mcs` (publicável)
-│   ├── apply-engine/        # @mcs/apply-engine
-│   ├── manifest/            # @mcs/manifest (Zod + tipos)
+│   ├── apply-engine/        # my-collec-skills-apply-engine
+│   ├── manifest/            # my-collec-skills-manifest (Zod + tipos)
 │   └── db/                  # @mcs/db — schema Prisma + client (opcional no bootstrap)
 ├── docker-compose.yml       # Postgres local
 ├── .env.example
@@ -69,8 +69,8 @@ my-collec-skills/
 
 | Pacote | Nome npm (interno) | Consumidores |
 | --- | --- | --- |
-| Manifesto | `@mcs/manifest` | web, cli, extension, apply-engine |
-| Apply | `@mcs/apply-engine` | cli, extension |
+| Manifesto | `my-collec-skills-manifest` | web, cli, extension, apply-engine |
+| Apply | `my-collec-skills-apply-engine` | cli, extension |
 | DB | `@mcs/db` | web (API / server) |
 | CLI | `mcs` (binário público) | usuários finais via `npx` / `pnpm dlx` / `bunx` |
 | Web | `@mcs/web` (privado) | deploy da app |
@@ -148,7 +148,7 @@ Sem email/senha próprio no MVP. Sem SSO corporativo além desses providers.
 ### Contrato
 
 - Validação de entrada/saída com **Zod**.
-- Schemas de domínio e do **Profile Manifest** vivem em `@mcs/manifest` (e, quando fizer sentido, schemas de request em `apps/web`).
+- Schemas de domínio e do **Profile Manifest** vivem em `my-collec-skills-manifest` (e, quando fizer sentido, schemas de request em `apps/web`).
 - Endpoints principais do MVP (conceituais):
 
 | Método | Recurso | Uso |
@@ -199,8 +199,8 @@ Sem email/senha próprio no MVP. Sem SSO corporativo além desses providers.
 ### Distribuição
 
 ```bash
-npx @mcs/cli install --username <user> --perfil <slug>
-pnpm dlx @mcs/cli install --username <user> --perfil <slug>
+npx my-collec-skills install --username <user> --perfil <slug>
+pnpm dlx my-collec-skills install --username <user> --perfil <slug>
 bunx mcs install --username <user> --perfil <slug>
 yarn dlx mcs install --username <user> --perfil <slug>
 ```
@@ -212,7 +212,7 @@ yarn dlx mcs install --username <user> --perfil <slug>
 | Linguagem | TypeScript |
 | Parser CLI | **citty** (preferência) ou commander |
 | Empacotamento | pacote npm com `bin: { "mcs": "..." }` |
-| Dependências internas | `@mcs/manifest`, `@mcs/apply-engine` |
+| Dependências internas | `my-collec-skills-manifest`, `my-collec-skills-apply-engine` |
 
 ### Flags
 
@@ -222,8 +222,8 @@ yarn dlx mcs install --username <user> --perfil <slug>
 ### Comportamento
 
 1. Resolve profile na API (`username` + `slug`)
-2. Baixa/valida o manifesto (`@mcs/manifest`)
-3. Aplica no workspace via `@mcs/apply-engine`
+2. Baixa/valida o manifesto (`my-collec-skills-manifest`)
+3. Aplica no workspace via `my-collec-skills-apply-engine`
 4. Feedback claro no terminal (sucesso / pendências / erros)
 
 ---
@@ -252,16 +252,16 @@ yarn dlx mcs install --username <user> --perfil <slug>
 
 ---
 
-## 11. `@mcs/manifest` e `@mcs/apply-engine`
+## 11. `my-collec-skills-manifest` e `my-collec-skills-apply-engine`
 
-### `@mcs/manifest`
+### `my-collec-skills-manifest`
 
 - Schemas Zod do **Profile Manifest** (JSON).
 - Tipos TypeScript exportados (`z.infer`).
 - Inclui collections com `category` + `subcategory`, itens tipados (`skill` | `agent` | `mcp`), refs de docs e extensões de IDE.
 - Usado para validar respostas da API e arquivos locais.
 
-### `@mcs/apply-engine`
+### `my-collec-skills-apply-engine`
 
 - Entrada: manifesto validado + opções (`ide`, `cwd`, `force`, `dryRun`).
 - Saída: relatório do que foi aplicado / pulado / falhou.
@@ -269,10 +269,10 @@ yarn dlx mcs install --username <user> --perfil <slug>
 - **Sem** dependência do Next.js ou da UI; só Node + FS (+ APIs da IDE quando chamado pela extensão).
 
 ```text
-API ──► Manifest JSON ──► @mcs/manifest (parse/validate)
+API ──► Manifest JSON ──► my-collec-skills-manifest (parse/validate)
                               │
                               ▼
-                        @mcs/apply-engine
+                        my-collec-skills-apply-engine
                            /        \
                       CLI mcs    Extensão IDE
 ```
@@ -289,7 +289,7 @@ API ──► Manifest JSON ──► @mcs/manifest (parse/validate)
 │             │◄───────────────│  Route Handlers  │
 └──────┬──────┘                └────────┬─────────┘
        │                                │
-       │ npx @mcs/cli / Open in IDE        │ Prisma
+       │ npx my-collec-skills / Open in IDE        │ Prisma
        ▼                                ▼
 ┌──────────────┐                 ┌──────────────┐
 │ packages/cli │                 │  PostgreSQL  │
@@ -298,7 +298,7 @@ API ──► Manifest JSON ──► @mcs/manifest (parse/validate)
        │
        ▼
 ┌──────────────────┐
-│ @mcs/apply-engine│──► Cursor / workspace local
+│ my-collec-skills-apply-engine│──► Cursor / workspace local
 └──────────────────┘
 ```
 
@@ -326,7 +326,7 @@ Detalhes e exemplos ficam em `.env.example` no bootstrap.
 4. Scaffold `apps/web` (Next.js + Tailwind + shadcn)
 5. Auth.js (GitHub + GitLab)
 6. CRUD Profile/Collection + endpoint de manifesto
-7. `@mcs/manifest` + `@mcs/apply-engine`
+7. `my-collec-skills-manifest` + `my-collec-skills-apply-engine`
 8. `packages/cli` (`mcs install`)
 9. `apps/extension` consumindo o mesmo motor
 

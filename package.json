@@ -1,5 +1,5 @@
 {
-  "name": "my-collec-skills",
+  "name": "my-collec-skills-workspace",
   "private": true,
   "version": "0.0.0",
   "description": "My Collec Skills — profiles, collections, CLI mcs e extensão IDE",
@@ -7,12 +7,12 @@
   "scripts": {
     "dev": "pnpm --filter web dev",
     "build": "pnpm db:generate && pnpm build:packages && pnpm --filter web build",
-    "build:packages": "pnpm --filter @mcs/manifest --filter @mcs/apply-engine --filter @mcs/cli build",
+    "build:packages": "pnpm --filter my-collec-skills-manifest --filter my-collec-skills-apply-engine --filter my-collec-skills build",
     "typecheck": "pnpm -r typecheck",
     "lint": "pnpm --filter web lint",
     "test": "pnpm -r test",
-    "publish:packages:dry": "pnpm --filter @mcs/manifest --filter @mcs/apply-engine --filter @mcs/cli publish --dry-run --access public",
-    "publish:packages": "pnpm --filter @mcs/manifest publish --access public && pnpm --filter @mcs/apply-engine publish --access public && pnpm --filter @mcs/cli publish --access public",
+    "publish:packages:dry": "pnpm --filter my-collec-skills-manifest --filter my-collec-skills-apply-engine --filter my-collec-skills publish --dry-run --access public --no-git-checks",
+    "publish:packages": "pnpm --filter my-collec-skills-manifest publish --access public && pnpm --filter my-collec-skills-apply-engine publish --access public && pnpm --filter my-collec-skills publish --access public",
     "db:up": "docker compose up -d",
     "db:down": "docker compose down",
     "db:migrate": "prisma migrate dev",

@@ -13,11 +13,11 @@ order: "aC"
 
 # Apply profile local
 
-Motor compartilhado `@mcs/apply-engine`: manifesto validado → apply no workspace local.
+Motor compartilhado `my-collec-skills-apply-engine`: manifesto validado → apply no workspace local.
 
 ## Escopo
 
-- Pacote `@mcs/apply-engine` (sem dependência de Next.js/UI)
+- Pacote `my-collec-skills-apply-engine` (sem dependência de Next.js/UI)
 - Entrada: manifesto + opções (`ide`, `cwd`, `force`, `dryRun`)
 - Saída: relatório aplicado / pulado / falhou
 - Consumido pela CLI e pela extensão IDE

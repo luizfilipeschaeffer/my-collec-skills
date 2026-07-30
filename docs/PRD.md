@@ -165,8 +165,8 @@ mcs install --username <user> --perfil <slug>
 Equivalentes:
 
 ```bash
-npx @mcs/cli install --username alice --perfil nextjs-prisma
-pnpm dlx @mcs/cli install --username alice --perfil nextjs-prisma
+npx my-collec-skills install --username alice --perfil nextjs-prisma
+pnpm dlx my-collec-skills install --username alice --perfil nextjs-prisma
 bunx mcs install --username alice --perfil nextjs-prisma
 yarn dlx mcs install --username alice --perfil nextjs-prisma
 ```
@@ -174,8 +174,8 @@ yarn dlx mcs install --username alice --perfil nextjs-prisma
 ### Comportamento
 
 1. Resolve profile público (ou autorizado) por `username` + `perfil` (slug)
-2. Baixa e valida o manifesto (`@mcs/manifest`)
-3. Aplica no workspace via `@mcs/apply-engine` (skills, agents, MCPs, docs refs, extensões da IDE)
+2. Baixa e valida o manifesto (`my-collec-skills-manifest`)
+3. Aplica no workspace via `my-collec-skills-apply-engine` (skills, agents, MCPs, docs refs, extensões da IDE)
 4. Feedback claro no terminal
 
 ### Flags
@@ -228,7 +228,7 @@ CLI e extensão compartilham **ApplyEngine** e o contrato do manifesto.
 
 ### J3 — Apply via CLI
 
-1. No workspace local: `npx @mcs/cli install --username … --perfil …`  
+1. No workspace local: `npx my-collec-skills install --username … --perfil …`  
 2. Manifesto resolvido → apply → feedback no terminal
 
 ### J4 — Apply via extensão
@@ -294,7 +294,7 @@ Developer
    │                                       ├──► Profile API ──► Manifest
    └── Extensão IDE MCS ──────────────────┘         │
                                                      ▼
-                                              @mcs/apply-engine
+                                              my-collec-skills-apply-engine
                                                      │
                                                      ▼
                                               Cursor / workspace local
@@ -308,7 +308,7 @@ Detalhe de stack e monorepo: [`docs/STACK.md`](./STACK.md).
 
 ## 12. Manifesto JSON do perfil (contrato)
 
-Contrato consumido pela **CLI** e pela **extensão**. Validado por `@mcs/manifest` (Zod).
+Contrato consumido pela **CLI** e pela **extensão**. Validado por `my-collec-skills-manifest` (Zod).
 
 ### Shape conceitual (MVP)
 
@@ -363,7 +363,7 @@ Resumo (fonte de verdade: [`docs/STACK.md`](./STACK.md)):
 | Banco | Docker Compose Postgres + Prisma |
 | CLI | `mcs` (TypeScript + citty) |
 | Extensão | VS Code Extension API (Cursor-first) |
-| Núcleo | `@mcs/apply-engine` + `@mcs/manifest` |
+| Núcleo | `my-collec-skills-apply-engine` + `my-collec-skills-manifest` |
 
 ### Bootstrap local (esta fase)
 

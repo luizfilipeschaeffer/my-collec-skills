@@ -1,12 +1,12 @@
 # Extensão IDE — My Collec Skills (MCS)
 
-Extensão **Cursor / VS Code** (API VS Code) para instalar e gerenciar profiles MCS no workspace ativo, reutilizando `@mcs/manifest` e `@mcs/apply-engine`.
+Extensão **Cursor / VS Code** (API VS Code) para instalar e gerenciar profiles MCS no workspace ativo, reutilizando `my-collec-skills-manifest` e `my-collec-skills-apply-engine`.
 
 ## Requisitos
 
 - Node.js 20+
 - pnpm (workspace do monorepo)
-- Pacotes `@mcs/manifest` e `@mcs/apply-engine` no monorepo
+- Pacotes `my-collec-skills-manifest` e `my-collec-skills-apply-engine` no monorepo
 
 ## Scripts
 
@@ -78,8 +78,8 @@ Settings → procure por **My Collec Skills**.
 
 1. Informa `username` e `slug` (input boxes).
 2. `GET {mcs.apiUrl}/api/profiles/:username/:slug/manifest`
-3. Valida com `parseProfileManifest` (`@mcs/manifest`)
-4. Aplica com `applyProfile` (`@mcs/apply-engine`) no workspace ativo
+3. Valida com `parseProfileManifest` (`my-collec-skills-manifest`)
+4. Aplica com `applyProfile` (`my-collec-skills-apply-engine`) no workspace ativo
 5. Atualiza a TreeView com status **aplicado** / **pendente**
 
 Token opcional (Bearer) lido do **SecretStorage** após `MCS: Login`.

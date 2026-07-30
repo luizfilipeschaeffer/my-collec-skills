@@ -1,6 +1,6 @@
 import { authenticateBearer } from "@/lib/api-token";
 import { resolveProfileManifest } from "@/lib/profile-manifest";
-import { parseProfileManifest } from "@mcs/manifest";
+import { parseProfileManifest } from "my-collec-skills-manifest";
 
 type Context = { params: Promise<{ username: string; slug: string }> };
 

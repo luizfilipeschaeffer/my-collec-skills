@@ -1,5 +1,5 @@
 import { defineCommand, runMain } from "citty";
-import type { IdeTarget } from "@mcs/manifest";
+import type { IdeTarget } from "my-collec-skills-manifest";
 import { CLI_NAME, CLI_VERSION, PACKAGE_NAME, printHelp } from "./help.js";
 import { InstallError, runInstall } from "./install.js";
 
@@ -119,7 +119,7 @@ export const main = defineCommand({
     version: versionCommand,
   },
   async run() {
-    // No subcommand → full help (better DX for `npx @mcs/cli` and AIs)
+    // No subcommand → full help (better DX for `npx my-collec-skills` and AIs)
     printHelp();
   },
 });

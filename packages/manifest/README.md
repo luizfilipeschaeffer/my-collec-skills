@@ -1,11 +1,11 @@
-# `@mcs/manifest`
+# `my-collec-skills-manifest`
 
 Contrato Zod do **Profile Manifest v1** consumido pela CLI `mcs` e pela extensão IDE.
 
 ## Uso
 
 ```ts
-import { parseProfileManifest, ProfileManifestSchema } from "@mcs/manifest";
+import { parseProfileManifest, ProfileManifestSchema } from "my-collec-skills-manifest";
 
 const manifest = parseProfileManifest(json);
 ```

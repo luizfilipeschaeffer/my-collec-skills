@@ -1,18 +1,18 @@
-# `mcs` CLI (`@mcs/cli`)
+# `mcs` CLI (`my-collec-skills`)
 
 CLI pública do My Collec Skills — instala profiles AI-ready no workspace local.
 
-> **Nota:** o pacote npm se chama `@mcs/cli` (o nome curto `mcs` no npm já está ocupado).
+> **Nota:** o pacote npm se chama `my-collec-skills` (o nome curto `mcs` no npm já está ocupado).
 > O binário instalado continua sendo `mcs`.
 
 ## Help (humano + IA)
 
 ```bash
-npx @mcs/cli help
-bunx @mcs/cli help
-npx @mcs/cli --help
+npx my-collec-skills help
+bunx my-collec-skills help
+npx my-collec-skills --help
 # sem argumentos também mostra o help completo
-npx @mcs/cli
+npx my-collec-skills
 ```
 
 O help documenta comandos, flags, exemplos `npx`/`bunx`, variáveis de ambiente, exit codes e notas para agentes de IA.
@@ -21,14 +21,14 @@ O help documenta comandos, flags, exemplos `npx`/`bunx`, variáveis de ambiente,
 
 ```bash
 # Após publicar no npm (mesmo registry para Bun):
-npx @mcs/cli install --username alice --perfil nextjs-prisma
-bunx @mcs/cli install --username alice --perfil nextjs-prisma
+npx my-collec-skills install --username alice --perfil nextjs-prisma
+bunx my-collec-skills install --username alice --perfil nextjs-prisma
 
 # Preview seguro
-npx @mcs/cli install --username demo --perfil nextjs-prisma --dry-run
+npx my-collec-skills install --username demo --perfil nextjs-prisma --dry-run
 
 # Desenvolvimento local (monorepo):
-pnpm --filter @mcs/cli build
+pnpm --filter my-collec-skills build
 node packages/cli/dist/bin.js help
 node packages/cli/dist/bin.js install \
   --username demo --perfil nextjs-prisma \
@@ -48,12 +48,12 @@ Guia de release: [`docs/PUBLISH.md`](../../docs/PUBLISH.md).
 | `--force` | Sobrescreve conteúdo diferente |
 | `--ide` | `cursor` \| `vscode` (default: `cursor`) |
 
-Fluxo: `GET /api/profiles/:username/:slug/manifest` → `@mcs/manifest` → `@mcs/apply-engine`.
+Fluxo: `GET /api/profiles/:username/:slug/manifest` → `my-collec-skills-manifest` → `my-collec-skills-apply-engine`.
 
 ## API programática
 
 ```ts
-import { runInstall, getHelpText } from "@mcs/cli";
+import { runInstall, getHelpText } from "my-collec-skills";
 
 console.log(getHelpText());
 await runInstall({ username: "alice", perfil: "nextjs-prisma", dryRun: true });
@@ -61,8 +61,8 @@ await runInstall({ username: "alice", perfil: "nextjs-prisma", dryRun: true });
 
 ## Scripts
 
-- `pnpm --filter @mcs/cli build`
-- `pnpm --filter @mcs/cli test`
-- `pnpm --filter @mcs/cli typecheck`
+- `pnpm --filter my-collec-skills build`
+- `pnpm --filter my-collec-skills test`
+- `pnpm --filter my-collec-skills typecheck`
 
 Binário: `mcs` → `dist/bin.js`

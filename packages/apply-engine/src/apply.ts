@@ -1,5 +1,5 @@
 import path from "node:path";
-import type { CatalogItem, DocItem, IdeTarget, McpItem, ProfileManifest } from "@mcs/manifest";
+import type { CatalogItem, DocItem, IdeTarget, McpItem, ProfileManifest } from "my-collec-skills-manifest";
 import { collectAgents, collectMcps, collectSkills } from "./collect.js";
 import { readFileIfExists, writeFileAtomic } from "./fs.js";
 import { assertSafeId, resolveSafePath } from "./paths.js";

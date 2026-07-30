@@ -753,7 +753,7 @@ export function DashboardClient({
             </CardHeader>
             <CardContent className="space-y-4">
               {profiles.map((profile) => {
-                const command = `npx @mcs/cli install --username ${username} --perfil ${profile.slug}`;
+                const command = `npx my-collec-skills install --username ${username} --perfil ${profile.slug}`;
                 return (
                   <div
                     key={profile.id}

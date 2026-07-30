@@ -27,7 +27,7 @@ Falta um jeito leve de:
 | **Connectors** | Busca direta em bibliotecas de skills, docs e registries de MCPs |
 | **IDE extensions** | Extensões pré-selecionadas por IDE (Cursor / VS Code / JetBrains / Nova / windsurf) |
 | **Share + Apply** | Compartilhar perfil e aplicar no ambiente local |
-| **CLI `@mcs/cli`** | Install sem fricção: `npx @mcs/cli install --username <user> --perfil <slug>` |
+| **CLI `my-collec-skills`** | Install sem fricção: `npx my-collec-skills install --username <user> --perfil <slug>` |
 | **Extensão IDE `mcs`** | Painel na IDE para gerenciar skills/coleções/profiles e apply local |
 
 ### Coleções por categoria
@@ -63,7 +63,7 @@ Documentação completa: [`docs/STACK.md`](docs/STACK.md)
 | ORM | **Prisma** |
 | CLI `mcs` | TypeScript + citty (publicável no npm) |
 | Extensão IDE | VS Code Extension API (**Cursor**-first) |
-| Núcleo | `@mcs/apply-engine` + `@mcs/manifest` |
+| Núcleo | `my-collec-skills-apply-engine` + `my-collec-skills-manifest` |
 
 ### Fontes externas (conectores)
 
@@ -99,12 +99,12 @@ Montar Profile (+ extensões por IDE)
 Mesma mentalidade de `npm` / `pnpm` / `bun` / `yarn install` — um comando e o ambiente sobe:
 
 ```bash
-# Pacote npm: @mcs/cli (binário: mcs)
+# Pacote npm: my-collec-skills (binário: mcs)
 # Evita colisão com o pacote npm "mcs" não relacionado.
-npx @mcs/cli install --username alice --perfil nextjs-prisma
+npx my-collec-skills install --username alice --perfil nextjs-prisma
 
 # Desenvolvimento local
-pnpm --filter @mcs/cli build
+pnpm --filter my-collec-skills build
 node packages/cli/dist/bin.js install \
   --username demo --perfil nextjs-prisma \
   --api-url http://localhost:3000 --dry-run
@@ -115,8 +115,8 @@ node packages/cli/dist/bin.js install \
 Help completo (humano + IA):
 
 ```bash
-npx @mcs/cli help
-bunx @mcs/cli help
+npx my-collec-skills help
+bunx my-collec-skills help
 ```
 
 ### Extensão de IDE (`mcs`)
@@ -210,7 +210,7 @@ pnpm build
 pnpm db:status
 
 # CLI contra a API local
-pnpm --filter @mcs/cli build
+pnpm --filter my-collec-skills build
 node packages/cli/dist/bin.js install \
   --username demo --perfil nextjs-prisma \
   --api-url http://localhost:3000 --dry-run
