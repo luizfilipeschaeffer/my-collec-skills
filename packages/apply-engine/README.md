@@ -19,13 +19,13 @@ const report = await applyProfile(manifest, {
 
 ## Efeitos
 
-| Item | Destino |
-| --- | --- |
-| Skills | `.cursor/skills/<id>/SKILL.md` |
-| Agents | `.cursor/agents/<id>.md` |
-| MCPs | `.cursor/mcp.json` (merge seguro) |
-| Docs | `.mcs/docs.json` |
-| Extensions | relatório + comando sugerido (não executa) |
+| Item | Cursor | VS Code |
+| --- | --- | --- |
+| Skills | `.cursor/skills/<id>/SKILL.md` | `.github/skills/<id>/SKILL.md` |
+| Agents | `.cursor/agents/<id>.md` | `.github/agents/<id>.md` |
+| MCPs | `.cursor/mcp.json` (merge seguro) | `.vscode/mcp.json` (merge seguro) |
+| Docs | `.mcs/docs.json` | `.mcs/docs.json` |
+| Extensions | relatório + comando sugerido (não executa) | idem |
 
 Proteção contra path traversal, escrita atômica e relatório `applied` / `skipped` / `failed`.
 

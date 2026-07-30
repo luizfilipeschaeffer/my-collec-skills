@@ -1,6 +1,6 @@
 {
   "name": "my-collec-skills-manifest",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Zod schemas and types for MCS Profile Manifest v1",
   "type": "module",
   "main": "./dist/index.js",

@@ -2,6 +2,7 @@ import path from "node:path";
 import type { CatalogItem, DocItem, IdeTarget, McpItem, ProfileManifest } from "my-collec-skills-manifest";
 import { collectAgents, collectMcps, collectSkills } from "./collect.js";
 import { readFileIfExists, writeFileAtomic } from "./fs.js";
+import { getIdeLayout, type IdeLayout } from "./layout.js";
 import { assertSafeId, resolveSafePath } from "./paths.js";
 import type {
   ApplyItemResult,
@@ -12,6 +13,7 @@ import type {
 interface Ctx {
   cwd: string;
   ide: IdeTarget;
+  layout: IdeLayout;
   dryRun: boolean;
   force: boolean;
   results: ApplyItemResult[];
@@ -88,7 +90,7 @@ async function applySkill(ctx: Ctx, item: CatalogItem): Promise<void> {
       });
       return;
     }
-    const skillsDir = resolveSafePath(ctx.cwd, ".cursor", "skills");
+    const skillsDir = resolveSafePath(ctx.cwd, ...ctx.layout.skillsDir);
     const filePath = resolveSafePath(skillsDir, id, "SKILL.md");
     await applyTextFile(ctx, "skill", id, filePath, item.content);
   } catch (err) {
@@ -113,7 +115,7 @@ async function applyAgent(ctx: Ctx, item: CatalogItem): Promise<void> {
       });
       return;
     }
-    const agentsDir = resolveSafePath(ctx.cwd, ".cursor", "agents");
+    const agentsDir = resolveSafePath(ctx.cwd, ...ctx.layout.agentsDir);
     const filePath = resolveSafePath(agentsDir, `${id}.md`);
     await applyTextFile(ctx, "agent", id, filePath, item.content);
   } catch (err) {
@@ -134,7 +136,8 @@ type McpJson = {
 async function applyMcps(ctx: Ctx, items: McpItem[]): Promise<void> {
   if (items.length === 0) return;
 
-  const mcpPath = resolveSafePath(ctx.cwd, ".cursor", "mcp.json");
+  const mcpPath = resolveSafePath(ctx.cwd, ...ctx.layout.mcpFile);
+  const mcpLabel = ctx.layout.mcpFile.join("/");
   let current: McpJson = { mcpServers: {} };
 
   const raw = await readFileIfExists(mcpPath);
@@ -150,7 +153,7 @@ async function applyMcps(ctx: Ctx, items: McpItem[]): Promise<void> {
         id: "mcp.json",
         status: "failed",
         path: mcpPath,
-        message: "Existing .cursor/mcp.json is not valid JSON",
+        message: `Existing ${mcpLabel} is not valid JSON`,
       });
       return;
     }
@@ -362,9 +365,11 @@ export async function applyProfile(
   manifest: ProfileManifest,
   options: ApplyOptions = {},
 ): Promise<ApplyReport> {
+  const ide = options.ide ?? "cursor";
   const ctx: Ctx = {
     cwd: path.resolve(options.cwd ?? process.cwd()),
-    ide: options.ide ?? "cursor",
+    ide,
+    layout: getIdeLayout(ide),
     dryRun: options.dryRun ?? false,
     force: options.force ?? false,
     results: [],

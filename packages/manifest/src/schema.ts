@@ -20,7 +20,7 @@ export const CatalogItemSchema = z.object({
 });
 export type CatalogItem = z.infer<typeof CatalogItemSchema>;
 
-/** MCP server config fragment merged into `.cursor/mcp.json`. */
+/** MCP server config fragment merged into the IDE MCP JSON (`.cursor/mcp.json` or `.vscode/mcp.json`). */
 export const McpServerConfigSchema = z
   .object({
     command: z.string().min(1).optional(),

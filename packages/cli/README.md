@@ -46,7 +46,7 @@ Guia de release: [`docs/PUBLISH.md`](../../docs/PUBLISH.md).
 | `--api-url` | Base da API (ou `MCS_API_URL`) |
 | `--dry-run` | Só valida/reporta, sem escrever |
 | `--force` | Sobrescreve conteúdo diferente |
-| `--ide` | `cursor` \| `vscode` (default: `cursor`) |
+| `--ide` | `cursor` \| `vscode`. Se omitido em um terminal interativo, a CLI pergunta qual IDE deve receber o profile. Em CI/agentes, o padrão é `cursor`. |
 
 Fluxo: `GET /api/profiles/:username/:slug/manifest` → `my-collec-skills-manifest` → `my-collec-skills-apply-engine`.
 

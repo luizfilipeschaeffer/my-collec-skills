@@ -105,6 +105,66 @@ describe("applyProfile — happy path", () => {
     const ext = report.applied.find((r) => r.kind === "extension");
     expect(ext?.command).toContain("cursor --install-extension publisher.ext");
   });
+
+  it("writes VS Code layout when ide is vscode", async () => {
+    const cwd = await makeCwd();
+    const manifest = baseManifest({
+      skills: [
+        {
+          source: "local",
+          externalId: "api-design",
+          name: "API Design",
+          content: "# API\n",
+        },
+      ],
+      agents: [
+        {
+          source: "local",
+          externalId: "reviewer",
+          name: "Reviewer",
+          content: "# Reviewer\n",
+        },
+      ],
+      mcps: [
+        {
+          source: "registry",
+          externalId: "filesystem",
+          name: "Filesystem",
+          server: { command: "npx" },
+        },
+      ],
+      extensions: [
+        { ide: "vscode", id: "publisher.ext", name: "Example" },
+        { ide: "cursor", id: "cursor.only", name: "Cursor Only" },
+      ],
+    });
+
+    const report = await applyProfile(manifest, { cwd, ide: "vscode" });
+    expect(report.failed).toHaveLength(0);
+
+    expect(
+      await readFile(
+        path.join(cwd, ".github", "skills", "api-design", "SKILL.md"),
+        "utf8",
+      ),
+    ).toBe("# API\n");
+    expect(
+      await readFile(path.join(cwd, ".github", "agents", "reviewer.md"), "utf8"),
+    ).toBe("# Reviewer\n");
+
+    const mcp = JSON.parse(
+      await readFile(path.join(cwd, ".vscode", "mcp.json"), "utf8"),
+    );
+    expect(mcp.mcpServers.filesystem.command).toBe("npx");
+
+    const appliedExt = report.applied.find((r) => r.kind === "extension");
+    expect(appliedExt?.command).toContain("code --install-extension publisher.ext");
+    expect(
+      report.skipped.some(
+        (r) => r.kind === "extension" && r.id === "cursor.only",
+      ),
+    ).toBe(true);
+  });
 });
 
 describe("applyProfile — dry-run", () => {

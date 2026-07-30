@@ -2,6 +2,7 @@ import { defineCommand, runMain } from "citty";
 import type { IdeTarget } from "my-collec-skills-manifest";
 import { CLI_NAME, CLI_VERSION, PACKAGE_NAME, printHelp } from "./help.js";
 import { InstallError, runInstall } from "./install.js";
+import { resolveIdeTarget } from "./prompt-ide.js";
 
 const ideValues = new Set<IdeTarget>(["cursor", "vscode"]);
 
@@ -49,8 +50,8 @@ const installCommand = defineCommand({
     },
     ide: {
       type: "string",
-      description: "Target IDE: cursor | vscode (default: cursor)",
-      default: "cursor",
+      description:
+        "Target IDE: cursor | vscode (prompts interactively when omitted)",
     },
   },
   async run({ args }) {
@@ -59,16 +60,20 @@ const installCommand = defineCommand({
       const perfil = String(args.perfil);
       const apiUrl =
         args["api-url"] === undefined ? undefined : String(args["api-url"]);
+      const ide = await resolveIdeTarget(
+        parseIde(args.ide === undefined ? undefined : String(args.ide)),
+      );
+
       const result = await runInstall({
         username,
         perfil,
         apiUrl,
         dryRun: Boolean(args["dry-run"]),
         force: Boolean(args.force),
-        ide: parseIde(args.ide === undefined ? undefined : String(args.ide)),
+        ide,
       });
       console.log(
-        `Installed profile ${result.manifest.username}/${result.manifest.slug}`,
+        `Installed profile ${result.manifest.username}/${result.manifest.slug} → ${ide}`,
       );
       console.log(result.output);
       process.exitCode = result.exitCode;

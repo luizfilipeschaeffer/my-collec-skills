@@ -29,7 +29,7 @@ export interface ApplyReport {
 export interface ApplyOptions {
   /** Workspace root. Defaults to process.cwd(). */
   cwd?: string;
-  /** Target IDE; filters extensions. Defaults to "cursor". */
+  /** Target IDE; selects workspace layout and filters extensions. Defaults to "cursor". */
   ide?: IdeTarget;
   /** Plan only — no filesystem writes. */
   dryRun?: boolean;

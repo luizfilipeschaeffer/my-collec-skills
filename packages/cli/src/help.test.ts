@@ -11,6 +11,9 @@ describe("getHelpText", () => {
     expect(help).toContain("FOR AI AGENTS");
     expect(help).toContain("EXIT CODES");
     expect(help).toContain("MCS_API_URL");
+    expect(help).toContain("--ide");
+    expect(help).toContain("you will be asked to choose");
+    expect(help).toContain(".github/skills");
     expect(help).not.toContain("npx mcs install");
   });
 });
