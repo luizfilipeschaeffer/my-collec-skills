@@ -49,14 +49,20 @@ O mesmo padrão vale para **skills**, **agents** e **MCPs**:
 
 ## Stack do MVP
 
+Documentação completa: [`docs/STACK.md`](docs/STACK.md)
+
 | Camada | Escolha |
 | --- | --- |
-| App web | Híbrido (montar/compartilhar na web + apply local) |
-| UI | **100% [shadcn/ui](https://ui.shadcn.com)** |
-| Auth | OAuth **GitHub** e **GitLab** |
+| Monorepo | **pnpm workspaces** (+ Turborepo opcional) |
+| App web | **Next.js** (App Router) + híbrido (montar/compartilhar na web + apply local) |
+| UI | **100% [shadcn/ui](https://ui.shadcn.com)** + Tailwind |
+| Auth | **Auth.js** — OAuth **GitHub** e **GitLab** |
+| API | Route Handlers + **Zod** |
 | Banco local | **Docker + PostgreSQL** |
 | ORM | **Prisma** |
-| IDE principal | **Cursor** (extensões modeladas por IDE desde o início) |
+| CLI `mcs` | TypeScript + citty (publicável no npm) |
+| Extensão IDE | VS Code Extension API (**Cursor**-first) |
+| Núcleo | `@mcs/apply-engine` + `@mcs/manifest` |
 
 ### Fontes externas (conectores)
 
@@ -121,6 +127,7 @@ Estamos no início. Acompanhe o progresso aqui e nos commits.
 | Etapa | Status |
 | --- | --- |
 | Planejamento / PRD | Em andamento |
+| Stack técnica (`docs/STACK.md`) | Feito |
 | README (build in public) | Feito |
 | Kanban de features (`.devtool/features/`) | Pendente |
 | Docker + Postgres + Prisma (schema inicial) | Pendente |
@@ -132,7 +139,10 @@ Estamos no início. Acompanhe o progresso aqui e nos commits.
 | Extensão IDE `mcs` | Pendente |
 | Profiles + share + apply local | Pendente |
 
-Documentação de produto (quando existir): [`docs/PRD.md`](docs/PRD.md)
+Documentação:
+
+- Stack: [`docs/STACK.md`](docs/STACK.md)
+- Produto (quando existir): [`docs/PRD.md`](docs/PRD.md)
 
 ---
 

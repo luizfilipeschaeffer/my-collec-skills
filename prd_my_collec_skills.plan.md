@@ -27,6 +27,7 @@ isProject: false
 - **Plataforma MVP:** híbrido — app web para montar/compartilhar perfis + fluxo para aplicar no ambiente local
 - **IDE principal no MVP:** Cursor (skills, MCPs, agents); extensões modeladas por IDE (Cursor/VS Code) desde o início
 - **Auth MVP:** login OAuth com **GitHub** e **GitLab** (sem email/senha próprio no MVP)
+- **Stack técnica (aprovada):** documentada em [`docs/STACK.md`](../../docs/STACK.md) — monorepo pnpm, Next.js App Router, Auth.js, Route Handlers + Zod, CLI `mcs`, extensão IDE, `@mcs/apply-engine`, `@mcs/manifest`
 - **Banco local (início técnico):** **Docker + PostgreSQL + Prisma**
   - Postgres via `docker-compose`
   - ORM/migrations via Prisma
@@ -97,7 +98,7 @@ Estrutura do PRD (conteúdo de produto) + seção de **stack técnica inicial**:
 9. RF P0/P1 e RNF
 10. Arquitetura lógica (web + conectores + **MCS CLI** + **MCS IDE Extension** + Postgres)
 11. Manifesto JSON do perfil (contrato consumido pela CLI e pela extensão; collections com `category` + `subcategory`)
-12. **Stack e persistência local** — Docker Compose (Postgres), Prisma schema/migrations, variáveis de ambiente
+12. **Stack e persistência local** — ver [`docs/STACK.md`](../../docs/STACK.md): monorepo pnpm, Next.js, Auth.js, Route Handlers + Zod, Docker Compose (Postgres), Prisma, CLI `mcs`, extensão IDE, `@mcs/apply-engine` + `@mcs/manifest`
 13. **UI / design system** — 100% shadcn/ui na web; extensão com UI nativa da IDE (TreeView, Webview se necessário)
 14. Escopo / não-escopo, métricas, riscos, milestones
 
