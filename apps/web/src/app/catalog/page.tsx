@@ -19,8 +19,10 @@ export const metadata: Metadata = {
 };
 
 type Props = {
-  searchParams: Promise<{ q?: string; type?: string }>;
+  searchParams: Promise<{ q?: string; type?: string; page?: string }>;
 };
+
+const PAGE_SIZE = 48;
 
 const TYPES: Array<{ value: "all" | CatalogItemType; label: string }> = [
   { value: "all", label: "Todos" },
@@ -31,7 +33,7 @@ const TYPES: Array<{ value: "all" | CatalogItemType; label: string }> = [
 ];
 
 export default async function CatalogPage({ searchParams }: Props) {
-  const { q, type } = await searchParams;
+  const { q, type, page } = await searchParams;
   const selectedType =
     type === "skill" || type === "agent" || type === "mcp" || type === "doc"
       ? type
@@ -51,6 +53,16 @@ export default async function CatalogPage({ searchParams }: Props) {
     selectedType === "all"
       ? allItems
       : allItems.filter((item) => item.type === selectedType);
+  const requestedPage = Number.parseInt(page ?? "1", 10);
+  const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
+  const currentPage = Math.min(
+    Math.max(Number.isFinite(requestedPage) ? requestedPage : 1, 1),
+    totalPages,
+  );
+  const visibleItems = items.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
 
   const params = new URLSearchParams();
   if (q) params.set("q", q);
@@ -125,13 +137,54 @@ export default async function CatalogPage({ searchParams }: Props) {
                 : `${catalogTypeLabel(selectedType).toLowerCase()}${items.length === 1 ? "" : "s"}`}
             </p>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {items.map((item) => (
+              {visibleItems.map((item) => (
                 <CatalogItemCard
                   key={`${item.type}:${item.source}:${item.externalId}`}
                   item={item}
                 />
               ))}
             </div>
+            {totalPages > 1 ? (
+              <nav
+                className="flex items-center justify-between gap-4 border-t pt-6"
+                aria-label="Paginação do catálogo"
+              >
+                {currentPage === 1 ? (
+                  <Button variant="outline" disabled>
+                    Anterior
+                  </Button>
+                ) : (
+                  <Button asChild variant="outline">
+                    <Link
+                      href={buildFilterHref("/catalog", params, {
+                        page:
+                          currentPage > 2 ? String(currentPage - 1) : null,
+                      })}
+                    >
+                      Anterior
+                    </Link>
+                  </Button>
+                )}
+                <p className="text-sm text-muted-foreground">
+                  Página {currentPage} de {totalPages}
+                </p>
+                {currentPage === totalPages ? (
+                  <Button variant="outline" disabled>
+                    Próxima
+                  </Button>
+                ) : (
+                  <Button asChild variant="outline">
+                    <Link
+                      href={buildFilterHref("/catalog", params, {
+                        page: String(currentPage + 1),
+                      })}
+                    >
+                      Próxima
+                    </Link>
+                  </Button>
+                )}
+              </nav>
+            ) : null}
           </div>
         )}
       </main>

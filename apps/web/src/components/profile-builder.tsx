@@ -61,6 +61,9 @@ const EMPTY_DRAFT: Draft = {
   selectedKeys: [],
 };
 
+let cachedDraftRaw: string | null | undefined;
+let cachedDraft: Draft = EMPTY_DRAFT;
+
 function itemKey(item: CatalogItem) {
   return `${item.type}:${item.source}:${item.externalId}`;
 }
@@ -78,17 +81,30 @@ function toSlug(value: string) {
 
 function readDraft(): Draft {
   if (typeof window === "undefined") return EMPTY_DRAFT;
-  try {
-    const raw = localStorage.getItem(DRAFT_KEY);
-    if (!raw) return EMPTY_DRAFT;
-    return { ...EMPTY_DRAFT, ...(JSON.parse(raw) as Draft) };
-  } catch {
-    return EMPTY_DRAFT;
+
+  const raw = localStorage.getItem(DRAFT_KEY);
+  if (raw === cachedDraftRaw) return cachedDraft;
+
+  cachedDraftRaw = raw;
+  if (!raw) {
+    cachedDraft = EMPTY_DRAFT;
+    return cachedDraft;
   }
+
+  try {
+    cachedDraft = { ...EMPTY_DRAFT, ...(JSON.parse(raw) as Draft) };
+  } catch {
+    cachedDraft = EMPTY_DRAFT;
+  }
+
+  return cachedDraft;
 }
 
 function writeDraft(draft: Draft) {
-  localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+  const raw = JSON.stringify(draft);
+  localStorage.setItem(DRAFT_KEY, raw);
+  cachedDraftRaw = raw;
+  cachedDraft = draft;
 }
 
 function subscribeDraft(onStoreChange: () => void) {

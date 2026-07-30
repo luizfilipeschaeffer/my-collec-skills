@@ -17,7 +17,7 @@ prisma/*.db-journal
 
 # Build / tooling
 dist/
-build/
+/build/
 .next/
 .turbo/
 *.tsbuildinfo
