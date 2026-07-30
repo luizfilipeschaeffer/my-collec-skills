@@ -11,6 +11,7 @@ describe("getHelpText", () => {
     expect(help).toContain("FOR AI AGENTS");
     expect(help).toContain("EXIT CODES");
     expect(help).toContain("MCS_API_URL");
+    expect(help).toContain("https://my-collec-skills.vercel.app");
     expect(help).toContain("--ide");
     expect(help).toContain("you will be asked to choose");
     expect(help).toContain(".github/skills");

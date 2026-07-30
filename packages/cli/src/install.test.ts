@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  DEFAULT_API_URL,
   EXIT_NETWORK,
   EXIT_OK,
   EXIT_VALIDATION,
@@ -32,11 +33,11 @@ const sampleManifest = {
 };
 
 describe("resolveApiUrl", () => {
-  it("prefers explicit flag, then env, then localhost", () => {
+  it("prefers explicit flag, then env, then production API", () => {
     const prev = process.env.MCS_API_URL;
     try {
       delete process.env.MCS_API_URL;
-      expect(resolveApiUrl()).toBe("http://localhost:3000");
+      expect(resolveApiUrl()).toBe(DEFAULT_API_URL);
       process.env.MCS_API_URL = "https://api.example.com/";
       expect(resolveApiUrl()).toBe("https://api.example.com");
       expect(resolveApiUrl("https://flag.test/")).toBe("https://flag.test");

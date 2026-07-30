@@ -11,6 +11,7 @@ export const EXIT_USAGE = 1;
 export const EXIT_NETWORK = 2;
 export const EXIT_VALIDATION = 3;
 export const EXIT_APPLY = 4;
+export const DEFAULT_API_URL = "https://my-collec-skills.vercel.app";
 
 export interface InstallOptions {
   username: string;
@@ -35,7 +36,7 @@ export class InstallError extends Error {
 }
 
 export function resolveApiUrl(explicit?: string): string {
-  const url = explicit ?? process.env.MCS_API_URL ?? "http://localhost:3000";
+  const url = explicit ?? process.env.MCS_API_URL ?? DEFAULT_API_URL;
   return url.replace(/\/$/, "");
 }
 

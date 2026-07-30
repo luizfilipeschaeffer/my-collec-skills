@@ -4,6 +4,7 @@ export {
   validateManifest,
   formatReport,
   resolveApiUrl,
+  DEFAULT_API_URL,
   InstallError,
   EXIT_OK,
   EXIT_USAGE,

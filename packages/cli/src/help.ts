@@ -5,7 +5,7 @@
 
 export const CLI_NAME = "mcs";
 export const PACKAGE_NAME = "my-collec-skills";
-export const CLI_VERSION = "0.1.2";
+export const CLI_VERSION = "0.1.3";
 
 export function getHelpText(): string {
   return `
@@ -32,7 +32,7 @@ INSTALL
     --perfil <slug>     Profile slug (URL segment), e.g. nextjs-prisma
 
   Options:
-    --api-url <url>     API base URL (default: env MCS_API_URL or http://localhost:3000)
+    --api-url <url>     API base URL (default: env MCS_API_URL or https://my-collec-skills.vercel.app)
     --dry-run           Validate and report without writing files
     --force             Overwrite existing files when content differs
     --ide <target>      Target IDE: cursor | vscode | both
@@ -94,7 +94,8 @@ FOR AI AGENTS
   - Always pass --username and --perfil.
   - Pass --ide cursor|vscode|both in non-interactive contexts (CI / agents) to skip the prompt.
   - Use --dry-run first when unsure about workspace writes.
-  - Default API is localhost:3000; set --api-url or MCS_API_URL for deployed apps.
+  - Default API is https://my-collec-skills.vercel.app.
+  - Use --api-url or MCS_API_URL only to override it (for example, local development).
   - Idempotent apply: re-running skips identical content unless --force.
   - Programmatic API: import { runInstall } from "${PACKAGE_NAME}"
     (pass ide explicitly; no interactive prompt in the library API)

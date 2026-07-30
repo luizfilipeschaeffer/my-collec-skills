@@ -123,13 +123,16 @@ export const main = defineCommand({
     help: helpCommand,
     version: versionCommand,
   },
-  async run() {
-    // No subcommand → full help (better DX for `npx my-collec-skills` and AIs)
-    printHelp();
-  },
 });
 
-export function runCli(argv?: string[]): Promise<void> {
+export async function runCli(
+  argv: string[] = process.argv.slice(2),
+): Promise<void> {
+  if (argv.length === 0) {
+    printHelp();
+    return;
+  }
+
   return runMain(main, {
     rawArgs: argv,
     showUsage: async () => {

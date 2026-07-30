@@ -35,6 +35,9 @@ node packages/cli/dist/bin.js install \
   --api-url http://localhost:3000
 ```
 
+Por padrão, a CLI consulta `https://my-collec-skills.vercel.app`. Use
+`--api-url` ou `MCS_API_URL` somente para sobrescrever esse endereço.
+
 Guia de release: [`docs/PUBLISH.md`](../../docs/PUBLISH.md).
 
 ## Flags (`install`)
