@@ -19,6 +19,13 @@ enum IdeTarget {
   vscode
 }
 
+enum CatalogEntryType {
+  skill
+  agent
+  mcp
+  doc
+}
+
 model User {
   id            String         @id @default(cuid())
   username      String         @unique
@@ -252,4 +259,26 @@ model ProfileExtension {
   @@unique([profileId, ide, extensionId])
   @@index([profileId])
   @@index([ide])
+}
+
+/// Cached global catalog from built-in, skills.sh, MCP Registry, Claude Code.
+model CatalogEntry {
+  id          String           @id @default(cuid())
+  type        CatalogEntryType
+  source      String
+  externalId  String
+  name        String
+  description String?
+  url         String?
+  metadata    Json?
+  contentHash String?
+  fetchedAt   DateTime         @default(now())
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@unique([source, externalId])
+  @@index([type])
+  @@index([source])
+  @@index([fetchedAt])
+  @@index([name])
 }

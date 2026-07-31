@@ -1,3 +1,8 @@
+import {
+  catalogContents,
+  catalogMcpServers,
+} from "@/lib/catalog-content";
+import { lookupCatalogEntryMetadata } from "@/lib/catalog-sync";
 import { db } from "@mcs/db";
 
 export async function resolveProfileManifest(
@@ -33,7 +38,7 @@ export async function resolveProfileManifest(
 
   if (!profile) return null;
 
-  const mapItem = (item: {
+  const mapItem = async (item: {
     source: string;
     externalId: string;
     name: string;
@@ -42,29 +47,77 @@ export async function resolveProfileManifest(
   }) => {
     const metadata =
       item.metadata && typeof item.metadata === "object"
-        ? (item.metadata as Record<string, unknown>)
-        : undefined;
+        ? { ...(item.metadata as Record<string, unknown>) }
+        : {};
+
+    let cached: Record<string, unknown> | null = null;
+    try {
+      cached = await lookupCatalogEntryMetadata(item.source, item.externalId);
+    } catch {
+      cached = null;
+    }
+
+    const catalogContent =
+      (typeof cached?.content === "string" ? cached.content : undefined) ??
+      catalogContents[item.externalId];
+    const catalogServer =
+      (cached?.server && typeof cached.server === "object"
+        ? (cached.server as Record<string, unknown>)
+        : undefined) ?? catalogMcpServers[item.externalId];
+
+    if (catalogContent && typeof metadata.content !== "string") {
+      metadata.content = catalogContent;
+    }
+    if (catalogServer && !hasResolvableMcpServer(metadata)) {
+      metadata.server = catalogServer;
+    }
+    const enriched = Object.keys(metadata).length > 0 ? metadata : undefined;
     return {
       source: item.source,
       externalId: item.externalId,
       name: item.name,
       description: item.description ?? undefined,
       content:
-        typeof metadata?.content === "string" ? metadata.content : undefined,
-      metadata,
+        typeof enriched?.content === "string" ? enriched.content : undefined,
+      metadata: enriched,
     };
   };
 
-  const mcpItems = [
+  const collectionItems = await Promise.all(
+    profile.collections.map(async ({ collection }) => ({
+      id: collection.id,
+      type: collection.type,
+      category: collection.category.slug,
+      subcategory: collection.subcategory.slug,
+      name: collection.name,
+      description: collection.description ?? undefined,
+      items: await Promise.all(collection.items.map(mapItem)),
+    })),
+  );
+
+  const mcpSourceItems = [
     ...profile.mcps,
     ...profile.collections
       .filter(({ collection }) => collection.type === "mcp")
       .flatMap(({ collection }) => collection.items),
-  ].flatMap((item) => {
-    const base = mapItem(item);
+  ];
+
+  const mcpMapped = await Promise.all(mcpSourceItems.map(mapItem));
+  const mcpItems = mcpMapped.flatMap((base) => {
     const server = resolveMcpServer(base.metadata);
     return server ? [{ ...base, server }] : [];
   });
+
+  const [skills, agents, docs] = await Promise.all([
+    Promise.all(profile.skills.map(mapItem)),
+    Promise.all(profile.agents.map(mapItem)),
+    Promise.all(
+      profile.docs.map(async (item) => ({
+        ...(await mapItem(item)),
+        url: item.url ?? undefined,
+      })),
+    ),
+  ]);
 
   return {
     version: 1 as const,
@@ -72,24 +125,13 @@ export async function resolveProfileManifest(
     slug: profile.slug,
     name: profile.name,
     description: profile.description ?? undefined,
-    collections: profile.collections.map(({ collection }) => ({
-      id: collection.id,
-      type: collection.type,
-      category: collection.category.slug,
-      subcategory: collection.subcategory.slug,
-      name: collection.name,
-      description: collection.description ?? undefined,
-      items: collection.items.map(mapItem),
-    })),
-    skills: profile.skills.map(mapItem),
-    agents: profile.agents.map(mapItem),
+    collections: collectionItems,
+    skills,
+    agents,
     mcps: Array.from(
       new Map(mcpItems.map((item) => [item.externalId, item])).values(),
     ),
-    docs: profile.docs.map((item) => ({
-      ...mapItem(item),
-      url: item.url ?? undefined,
-    })),
+    docs,
     extensions: profile.extensions.map((item) => ({
       ide: item.ide,
       id: item.extensionId,
@@ -101,6 +143,10 @@ export async function resolveProfileManifest(
           : undefined,
     })),
   };
+}
+
+function hasResolvableMcpServer(metadata: Record<string, unknown>) {
+  return resolveMcpServer(metadata) !== null;
 }
 
 function resolveMcpServer(metadata?: Record<string, unknown>) {

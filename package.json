@@ -19,7 +19,8 @@
     "db:status": "prisma migrate status",
     "db:generate": "prisma generate",
     "db:seed": "tsx prisma/seed.ts",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "catalog:sync": "tsx --tsconfig apps/web/tsconfig.json scripts/run-catalog-sync.mts"
   },
   "license": "MIT",
   "repository": {

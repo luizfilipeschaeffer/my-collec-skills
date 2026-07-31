@@ -25,8 +25,36 @@ No projeto Vercel (`Root Directory` = `apps/web`), configure:
 | `MCS_DEMO_MODE` | `false` |
 | `AUTH_GITHUB_ID` / `AUTH_GITHUB_SECRET` | OAuth GitHub (callback production) |
 | `AUTH_GITLAB_ID` / `AUTH_GITLAB_SECRET` | OAuth GitLab (callback production) |
+| `CRON_SECRET` | Segredo para autorizar `/api/cron/catalog-sync` (`Authorization: Bearer …`) |
 
 OIDC Federation (skills.sh): Project → Settings → OIDC → ON.
+
+## Cron diário de catálogo
+
+`apps/web/vercel.json` agenda `GET /api/cron/catalog-sync` às **06:00 UTC** (`0 6 * * *`).
+
+O job:
+
+1. Upsert em `CatalogEntry` (built-in, skills.sh, MCP Registry, Claude Code / Anthropic)
+2. Backfill conservador de `metadata.content` / `metadata.server` em profiles/collections **só quando vazios**
+
+Fases opcionais (query): `?phase=builtin|skills-sh|mcp|claude|backfill|all`
+
+Localmente:
+
+```bash
+pnpm exec tsx --tsconfig apps/web/tsconfig.json scripts/run-catalog-sync.mts
+pnpm exec tsx --tsconfig apps/web/tsconfig.json scripts/run-catalog-sync.mts --phase=claude
+```
+
+Ou:
+
+```bash
+curl -H "Authorization: Bearer $CRON_SECRET" \
+  "https://my-collec-skills.vercel.app/api/cron/catalog-sync?phase=all"
+```
+
+O job **não** sobrescreve conteúdo já salvo pelo usuário nem aplica layout Claude (`.claude/skills`) — só materializa o cache.
 
 ### Callbacks OAuth
 

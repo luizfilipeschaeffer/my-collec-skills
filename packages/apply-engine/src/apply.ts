@@ -3,7 +3,7 @@ import type { CatalogItem, DocItem, IdeTarget, McpItem, ProfileManifest } from "
 import { collectAgents, collectMcps, collectSkills } from "./collect.js";
 import { readFileIfExists, writeFileAtomic } from "./fs.js";
 import { expandIdeTargets, getIdeLayout, type IdeLayout } from "./layout.js";
-import { assertSafeId, resolveSafePath } from "./paths.js";
+import { assertSafeId, assertSafeMcpKey, resolveSafePath } from "./paths.js";
 import type {
   ApplyItemResult,
   ApplyOptions,
@@ -165,7 +165,7 @@ async function applyMcps(ctx: Ctx, items: McpItem[]): Promise<void> {
 
   for (const item of items) {
     try {
-      const id = assertSafeId(item.externalId);
+      const id = assertSafeMcpKey(item.externalId);
       const nextServer: Record<string, unknown> = {};
       if (item.server.command) nextServer.command = item.server.command;
       if (item.server.args) nextServer.args = item.server.args;

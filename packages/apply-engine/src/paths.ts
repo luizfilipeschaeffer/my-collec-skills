@@ -22,6 +22,28 @@ export function assertSafeId(externalId: string): string {
 }
 
 /**
+ * MCP server names are JSON keys (not filesystem segments).
+ * Allow namespaced registry ids like `io.github.../server-github`.
+ */
+export function assertSafeMcpKey(externalId: string): string {
+  const id = externalId.trim();
+  if (!id) {
+    throw new Error("Empty externalId");
+  }
+  if (
+    id.includes("\0") ||
+    path.isAbsolute(id) ||
+    /^[a-zA-Z]:/.test(id) ||
+    /(^|[\\/])\.\.([\\/]|$)/.test(id) ||
+    id === "." ||
+    id === ".."
+  ) {
+    throw new Error(`Unsafe MCP key: ${externalId}`);
+  }
+  return id;
+}
+
+/**
  * Resolve a path under `baseDir` and ensure the result stays inside `baseDir`.
  */
 export function resolveSafePath(baseDir: string, ...segments: string[]): string {

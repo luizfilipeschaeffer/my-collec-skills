@@ -1,4 +1,8 @@
 import {
+  catalogContents,
+  catalogMcpServers,
+} from "@/lib/catalog-content";
+import {
   buildInstallCommand,
   listSkillsShCurated,
   listSkillsShLeaderboard,
@@ -20,7 +24,23 @@ export type CatalogItem = {
   metadata?: Record<string, unknown>;
 };
 
-export const builtInCatalog: CatalogItem[] = [
+function withApplyPayload(
+  item: CatalogItem,
+): CatalogItem {
+  const content = catalogContents[item.externalId];
+  const server = catalogMcpServers[item.externalId];
+  if (!content && !server) return item;
+  return {
+    ...item,
+    metadata: {
+      ...item.metadata,
+      ...(content ? { content } : {}),
+      ...(server ? { server } : {}),
+    },
+  };
+}
+
+const builtInCatalogSeed: CatalogItem[] = [
   // Skills
   {
     type: "skill",
@@ -226,7 +246,6 @@ export const builtInCatalog: CatalogItem[] = [
     url: "https://docs.stripe.com",
     metadata: { tags: ["payments", "stripe"] },
   },
-
   // Docs
   {
     type: "doc",
@@ -283,6 +302,9 @@ export const builtInCatalog: CatalogItem[] = [
     metadata: { tags: ["tailwind", "docs"] },
   },
 ];
+
+export const builtInCatalog: CatalogItem[] =
+  builtInCatalogSeed.map(withApplyPayload);
 
 type RegistryServer = {
   server?: {
@@ -485,6 +507,22 @@ export async function searchCatalog(options?: {
   );
 
   const sources = new Set<string>(["mcs-catalog"]);
+
+  // Prefer materialised cache from daily sync; fall back to live APIs.
+  try {
+    const { loadCatalogEntriesFromDb } = await import("@/lib/catalog-sync");
+    const cached = await loadCatalogEntriesFromDb({
+      q: query,
+      type,
+      take: options?.take && options.take > 0 ? options.take : 200,
+    });
+    if (cached.length > 0) {
+      items = dedupeItems([...items, ...cached]);
+      for (const item of cached) sources.add(item.source);
+    }
+  } catch {
+    // DB unavailable — continue with live connectors.
+  }
 
   const wantsMcp = !type || type === "all" || type === "mcp";
   if (includeRegistry && wantsMcp) {

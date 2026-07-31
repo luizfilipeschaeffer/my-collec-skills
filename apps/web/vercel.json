@@ -2,5 +2,11 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "installCommand": "cd ../.. && pnpm install",
-  "buildCommand": "cd ../.. && pnpm db:generate && pnpm --filter my-collec-skills-manifest build && pnpm --filter web build"
+  "buildCommand": "cd ../.. && pnpm db:generate && pnpm --filter my-collec-skills-manifest build && pnpm --filter web build",
+  "crons": [
+    {
+      "path": "/api/cron/catalog-sync",
+      "schedule": "0 6 * * *"
+    }
+  ]
 }
