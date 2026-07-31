@@ -145,11 +145,11 @@ export async function resolveProfileManifest(
   };
 }
 
-function hasResolvableMcpServer(metadata: Record<string, unknown>) {
+export function hasResolvableMcpServer(metadata: Record<string, unknown>) {
   return resolveMcpServer(metadata) !== null;
 }
 
-function resolveMcpServer(metadata?: Record<string, unknown>) {
+export function resolveMcpServer(metadata?: Record<string, unknown>) {
   if (!metadata) return null;
   const explicit = metadata.server;
   if (explicit && typeof explicit === "object") {

@@ -1,13 +1,27 @@
 import * as vscode from "vscode";
 import type { SessionStore } from "../auth/session.js";
 import {
+  ITEM_STATUS_STATE_KEY,
+  readItemStatuses,
+  type ItemStatusMap,
+  type StoredItemStatus,
+} from "../status/itemStatus.js";
+import {
   PROFILE_STATUS_STATE_KEY,
   readProfileStatuses,
   type ProfileStatusMap,
   type StoredProfileStatus,
 } from "../status/workspaceStatus.js";
 
-type NodeKind = "session" | "empty" | "profile" | "collection" | "hint";
+type NodeKind =
+  | "session"
+  | "search"
+  | "section"
+  | "item"
+  | "empty"
+  | "profile"
+  | "collection"
+  | "hint";
 
 export class McsTreeItem extends vscode.TreeItem {
   constructor(
@@ -15,6 +29,7 @@ export class McsTreeItem extends vscode.TreeItem {
     collapsible: vscode.TreeItemCollapsibleState,
     readonly kind: NodeKind,
     readonly profile?: StoredProfileStatus,
+    readonly installedItem?: StoredItemStatus,
   ) {
     super(label, collapsible);
   }
@@ -43,6 +58,14 @@ export class McsTreeProvider implements vscode.TreeDataProvider<McsTreeItem> {
     if (!element) {
       return this.getRoot();
     }
+    if (element.kind === "section") {
+      if (element.contextValue === "mcs.section.installed") {
+        return this.getInstalledItems();
+      }
+      if (element.contextValue === "mcs.section.profiles") {
+        return this.getProfileRoots();
+      }
+    }
     if (element.kind === "profile" && element.profile) {
       return this.getCollections(element.profile);
     }
@@ -63,6 +86,81 @@ export class McsTreeProvider implements vscode.TreeDataProvider<McsTreeItem> {
     sessionItem.iconPath = new vscode.ThemeIcon(token ? "verified" : "account");
     sessionItem.contextValue = "mcs.session";
 
+    const search = new McsTreeItem(
+      "Abrir Marketplace…",
+      vscode.TreeItemCollapsibleState.None,
+      "search",
+    );
+    search.iconPath = new vscode.ThemeIcon("window");
+    search.contextValue = "mcs.search";
+    search.command = {
+      command: "mcs.openMarketplace",
+      title: "MCS: Open Marketplace",
+    };
+    search.tooltip = "Abrir o painel MCS Marketplace como aba do editor";
+
+    const installed = new McsTreeItem(
+      "Instalados",
+      vscode.TreeItemCollapsibleState.Expanded,
+      "section",
+    );
+    installed.iconPath = new vscode.ThemeIcon("package");
+    installed.contextValue = "mcs.section.installed";
+
+    const profiles = new McsTreeItem(
+      "Profiles",
+      vscode.TreeItemCollapsibleState.Collapsed,
+      "section",
+    );
+    profiles.iconPath = new vscode.ThemeIcon("folder-library");
+    profiles.contextValue = "mcs.section.profiles";
+    profiles.tooltip = "Profiles aplicados (fluxo secundário)";
+
+    return [sessionItem, search, installed, profiles];
+  }
+
+  private getInstalledItems(): McsTreeItem[] {
+    const statuses = readItemStatuses((key) =>
+      this.workspaceState.get<ItemStatusMap>(key),
+    );
+    const items = Object.values(statuses).sort((a, b) =>
+      a.name.localeCompare(b.name),
+    );
+
+    if (items.length === 0) {
+      const empty = new McsTreeItem(
+        "Nenhum item — use Buscar no catálogo",
+        vscode.TreeItemCollapsibleState.None,
+        "empty",
+      );
+      empty.iconPath = new vscode.ThemeIcon("info");
+      return [empty];
+    }
+
+    return items.map((entry) => {
+      const item = new McsTreeItem(
+        entry.name,
+        vscode.TreeItemCollapsibleState.None,
+        "item",
+        undefined,
+        entry,
+      );
+      item.description = `${entry.type} · ${entry.status}`;
+      item.iconPath = new vscode.ThemeIcon(
+        entry.status === "applied" ? "check" : "warning",
+      );
+      item.tooltip = [
+        `${entry.type} · ${entry.source}/${entry.externalId}`,
+        `Status: ${entry.status}`,
+        `Último apply: ${entry.lastAppliedAt}`,
+        `applied=${entry.appliedCount} skipped=${entry.skippedCount} failed=${entry.failedCount}`,
+      ].join("\n");
+      item.contextValue = "mcs.item";
+      return item;
+    });
+  }
+
+  private getProfileRoots(): McsTreeItem[] {
     const statuses = readProfileStatuses((key) =>
       this.workspaceState.get<ProfileStatusMap>(key),
     );
@@ -83,10 +181,10 @@ export class McsTreeProvider implements vscode.TreeDataProvider<McsTreeItem> {
         "hint",
       );
       hint.iconPath = new vscode.ThemeIcon("tools");
-      return [sessionItem, empty, hint];
+      return [empty, hint];
     }
 
-    const profileItems = profiles.map((p) => {
+    return profiles.map((p) => {
       const item = new McsTreeItem(
         `${p.name} (${p.username}/${p.slug})`,
         p.collections.length > 0
@@ -107,8 +205,6 @@ export class McsTreeProvider implements vscode.TreeDataProvider<McsTreeItem> {
       item.contextValue = "mcs.profile";
       return item;
     });
-
-    return [sessionItem, ...profileItems];
   }
 
   private getCollections(profile: StoredProfileStatus): McsTreeItem[] {
@@ -138,4 +234,4 @@ export class McsTreeProvider implements vscode.TreeDataProvider<McsTreeItem> {
   }
 }
 
-export { PROFILE_STATUS_STATE_KEY };
+export { PROFILE_STATUS_STATE_KEY, ITEM_STATUS_STATE_KEY };

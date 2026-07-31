@@ -1,93 +1,72 @@
-# Extensão IDE — My Collec Skills (MCS)
+# Extensão IDE — My Collec Skills Marketplace
 
-Extensão **Cursor / VS Code** (API VS Code) para instalar e gerenciar profiles MCS no workspace ativo, reutilizando `my-collec-skills-manifest` e `my-collec-skills-apply-engine`.
+Extensão **Cursor / VS Code / Trae** com painel Marketplace aberto como **aba do editor**. Busque e selecione skills, agents, MCPs, docs, profiles e coleções; instale em lote no workspace.
 
-## Requisitos
+## Hosts suportados
 
-- Node.js 20+
-- pnpm (workspace do monorepo)
-- Pacotes `my-collec-skills-manifest` e `my-collec-skills-apply-engine` no monorepo
+| Host | Layout de arquivos (auto) |
+| --- | --- |
+| Cursor | `.cursor/skills`, `.cursor/agents`, `.cursor/mcp.json` |
+| VS Code | `.github/skills`, `.github/agents`, `.vscode/mcp.json` |
+| Trae / Windsurf / outros forks | layout VS Code |
+
+Override: `mcs.ideTarget` = `auto` \| `cursor` \| `vscode` \| `both`.
 
 ## Scripts
 
 ```bash
-# na raiz do monorepo
 pnpm install
-
-# neste pacote
 cd apps/extension
-pnpm run check      # typecheck
-pnpm run test       # vitest
-pnpm run build      # bundle → dist/extension.cjs
-pnpm run package    # gera .vsix (vsce)
+pnpm run check
+pnpm run test
+pnpm run build
+pnpm run package   # gera .vsix
 ```
 
-## Desenvolvimento no Cursor / VS Code
+## Instalar localmente (Cursor)
 
-### Opção A — Extension Development Host
-
-1. Abra o monorepo no Cursor ou VS Code.
-2. Em `apps/extension`:
-
-   ```bash
-   pnpm run build
-   # ou: pnpm run watch
-   ```
-
-3. Crie um launch config (exemplo) em `.vscode/launch.json` na raiz ou nesta pasta:
-
-   ```json
-   {
-     "version": "0.2.0",
-     "configurations": [
-       {
-         "name": "Run MCS Extension",
-         "type": "extensionHost",
-         "request": "launch",
-         "args": ["--extensionDevelopmentPath=${workspaceFolder}/apps/extension"]
-       }
-     ]
-   }
-   ```
-
-4. Inicie **Run MCS Extension** (F5). Uma nova janela Extension Development Host abre com a extensão carregada.
-5. Abra uma pasta de workspace na janela de desenvolvimento.
-6. Use a Activity Bar **MCS** ou a Command Palette:
-   - `MCS: Install Profile`
-   - `MCS: Manage Collections`
-   - `MCS: Login` / `MCS: Logout`
-
-### Opção B — Instalar VSIX
-
-```bash
-cd apps/extension
-pnpm run package
+```powershell
+pnpm --filter mcs-extension package
+cursor --install-extension "D:\Projetos-locais\my-collec-skills\apps\extension\mcs-extension-0.3.0.vsix" --force
 ```
 
-No Cursor / VS Code: **Extensions → … → Install from VSIX…** e selecione o `.vsix` gerado.
+Ou: **Extensions → … → Install from VSIX…**
+
+Depois: **Reload Window** → Command Palette → `MCS: Open Marketplace`.
+
+## Painel Marketplace
+
+O comando `MCS: Open Marketplace` abre uma aba no editor com:
+
+- navegação: Tudo / Skills / Agents / MCPs / Docs / Profiles / Coleções
+- busca e cards selecionáveis (checkbox)
+- carrinho multiseleção à direita
+- target IDE + opção force
+- **Instalar selecionados** (lote, com progresso)
+
+Profiles e coleções **públicas** aparecem sem login. Recursos privados do usuário aparecem após `MCS: Login` com token `mcs_*`.
 
 ## Configuração
 
 | Setting | Default | Descrição |
 | --- | --- | --- |
-| `mcs.apiUrl` | `http://localhost:3000` | Base URL da app web / Profile API |
+| `mcs.apiUrl` | `https://my-collec-skills.vercel.app` | Base da API MCS |
+| `mcs.ideTarget` | `auto` | Layout de apply |
 
-Settings → procure por **My Collec Skills**.
+## Comandos
 
-## Fluxo Install Profile
+| Comando | Uso |
+| --- | --- |
+| `MCS: Open Marketplace` | Abre o painel (principal) |
+| `MCS: Search Catalog` | Abre o painel com foco na busca |
+| `MCS: Install Profile` | Profile completo (secundário) |
+| `MCS: Login` / `Logout` | Token opcional |
+| `MCS: Refresh` | Atualiza a TreeView da Activity Bar |
 
-1. Informa `username` e `slug` (input boxes).
-2. `GET {mcs.apiUrl}/api/profiles/:username/:slug/manifest`
-3. Valida com `parseProfileManifest` (`my-collec-skills-manifest`)
-4. Aplica com `applyProfile` (`my-collec-skills-apply-engine`) no workspace ativo
-5. Atualiza a TreeView com status **aplicado** / **pendente**
+## APIs usadas
 
-Token opcional (Bearer) lido do **SecretStorage** após `MCS: Login`.
-
-## Login OAuth
-
-`MCS: Login` abre a URL OAuth da web (`/api/auth/signin/github` ou `gitlab`) no browser e permite colar um token/sessão opcional no SecretStorage da IDE.
-
-## UI
-
-Apenas UI nativa da IDE: Activity Bar, TreeView, Command Palette, InputBox, QuickPick, notificações. Sem Webview no MVP.
+- `GET /api/catalog`
+- `GET /api/marketplace/profiles`
+- `GET /api/marketplace/collections`
+- `GET /api/marketplace/collections/:id/manifest`
+- `GET /api/profiles/:user/:slug/manifest`

@@ -1,15 +1,23 @@
 {
   "name": "mcs-extension",
-  "displayName": "My Collec Skills",
-  "description": "Gerencie e aplique profiles MCS (skills, agents, MCPs) no workspace — Cursor / VS Code.",
-  "version": "0.1.0",
+  "displayName": "My Collec Skills Marketplace",
+  "description": "Busque e instale skills, agents, MCPs, docs, profiles e coleções no workspace — Cursor, VS Code e Trae.",
+  "version": "0.3.0",
   "publisher": "my-collec-skills",
-  "private": true,
   "license": "MIT",
   "type": "module",
+  "icon": "media/icon.png",
+  "galleryBanner": {
+    "color": "#1e293b",
+    "theme": "dark"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/my-collec-skills/my-collec-skills"
+    "url": "https://github.com/luizfilipeschaeffer/my-collec-skills.git"
+  },
+  "homepage": "https://github.com/luizfilipeschaeffer/my-collec-skills/tree/main/apps/extension#readme",
+  "bugs": {
+    "url": "https://github.com/luizfilipeschaeffer/my-collec-skills/issues"
   },
   "engines": {
     "vscode": "^1.85.0"
@@ -20,12 +28,20 @@
   "keywords": [
     "mcs",
     "skills",
+    "marketplace",
     "cursor",
+    "vscode",
+    "trae",
     "mcp",
+    "agents",
     "profile"
   ],
   "activationEvents": [
     "onView:mcs.sidebar",
+    "onWebviewPanel:mcs.marketplace",
+    "onCommand:mcs.openMarketplace",
+    "onCommand:mcs.searchCatalog",
+    "onCommand:mcs.installCatalogItem",
     "onCommand:mcs.installProfile",
     "onCommand:mcs.manageCollections",
     "onCommand:mcs.login",
@@ -39,16 +55,37 @@
       "properties": {
         "mcs.apiUrl": {
           "type": "string",
-          "default": "http://localhost:3000",
-          "description": "Base URL da Profile API MCS (sem barra final)."
+          "default": "https://my-collec-skills.vercel.app",
+          "description": "Base URL da API MCS (sem barra final)."
+        },
+        "mcs.ideTarget": {
+          "type": "string",
+          "enum": ["auto", "cursor", "vscode", "both"],
+          "default": "auto",
+          "description": "Layout de apply: auto detecta Cursor vs VS Code/Trae/outros; both aplica os dois layouts."
         }
       }
     },
     "commands": [
       {
+        "command": "mcs.openMarketplace",
+        "title": "MCS: Open Marketplace",
+        "icon": "$(window)"
+      },
+      {
+        "command": "mcs.searchCatalog",
+        "title": "MCS: Search Catalog",
+        "icon": "$(search)"
+      },
+      {
+        "command": "mcs.installCatalogItem",
+        "title": "MCS: Install Catalog Item",
+        "icon": "$(cloud-download)"
+      },
+      {
         "command": "mcs.installProfile",
         "title": "MCS: Install Profile",
-        "icon": "$(cloud-download)"
+        "icon": "$(repo)"
       },
       {
         "command": "mcs.manageCollections",
@@ -84,29 +121,46 @@
       "mcs": [
         {
           "id": "mcs.sidebar",
-          "name": "Profiles & Collections"
+          "name": "Marketplace"
         }
       ]
     },
     "menus": {
       "view/title": [
         {
-          "command": "mcs.refresh",
+          "command": "mcs.openMarketplace",
           "when": "view == mcs.sidebar",
           "group": "navigation@1"
         },
         {
-          "command": "mcs.installProfile",
+          "command": "mcs.refresh",
           "when": "view == mcs.sidebar",
           "group": "navigation@2"
         },
         {
-          "command": "mcs.login",
+          "command": "mcs.installProfile",
           "when": "view == mcs.sidebar",
           "group": "navigation@3"
+        },
+        {
+          "command": "mcs.login",
+          "when": "view == mcs.sidebar",
+          "group": "navigation@4"
         }
       ],
       "commandPalette": [
+        {
+          "command": "mcs.openMarketplace",
+          "when": "true"
+        },
+        {
+          "command": "mcs.searchCatalog",
+          "when": "true"
+        },
+        {
+          "command": "mcs.installCatalogItem",
+          "when": "true"
+        },
         {
           "command": "mcs.refresh",
           "when": "true"
@@ -121,8 +175,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "package": "pnpm run build && vsce package --no-dependencies",
-    "vscode:prepublish": "pnpm run build"
+    "package": "pnpm run build -- --production && vsce package --no-dependencies",
+    "vscode:prepublish": "pnpm run build -- --production"
   },
   "dependencies": {
     "my-collec-skills-apply-engine": "workspace:*",

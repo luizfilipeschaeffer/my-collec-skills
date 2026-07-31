@@ -4,10 +4,8 @@ node_modules/**
 **/*.ts
 **/*.map
 **/*.test.ts
-esbuild.mjs
-tsconfig.json
 vitest.config.ts
+tsconfig.json
+esbuild.mjs
 .gitignore
 **/.DS_Store
-dist/*.js
-dist/*.js.map

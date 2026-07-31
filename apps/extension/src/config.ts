@@ -1,13 +1,21 @@
+import type { IdeApplyTarget } from "my-collec-skills-apply-engine";
 import * as vscode from "vscode";
-import { normalizeApiUrl } from "./url.js";
+import {
+  parseIdeTargetSetting,
+  resolveIdeTarget,
+  type IdeTargetSetting,
+} from "./ide-target.js";
+import { DEFAULT_API_URL, normalizeApiUrl } from "./url.js";
 
 const CONFIG_SECTION = "mcs";
+
+export type { IdeTargetSetting };
 
 /** Base URL da Profile API (sem barra final). */
 export function getApiUrl(): string {
   const raw = vscode.workspace
     .getConfiguration(CONFIG_SECTION)
-    .get<string>("apiUrl", "http://localhost:3000");
+    .get<string>("apiUrl", DEFAULT_API_URL);
   return normalizeApiUrl(raw);
 }
 
@@ -17,7 +25,16 @@ export function getActiveWorkspacePath(): string | undefined {
   return folder?.uri.fsPath;
 }
 
-export function detectIdeTarget(): "cursor" | "vscode" {
-  const appName = vscode.env.appName.toLowerCase();
-  return appName.includes("cursor") ? "cursor" : "vscode";
+export function getIdeTargetSetting(): IdeTargetSetting {
+  const raw = vscode.workspace
+    .getConfiguration(CONFIG_SECTION)
+    .get<string>("ideTarget", "auto");
+  return parseIdeTargetSetting(raw);
+}
+
+export function detectIdeTarget(
+  appName: string = vscode.env.appName,
+  setting: IdeTargetSetting = getIdeTargetSetting(),
+): IdeApplyTarget {
+  return resolveIdeTarget(appName, setting);
 }
