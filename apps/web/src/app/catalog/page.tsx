@@ -5,9 +5,9 @@ import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
 import {
   catalogTypeLabel,
-  searchCatalog,
   type CatalogItemType,
 } from "@/lib/catalog";
+import { searchCatalog } from "@/lib/catalog-server";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";

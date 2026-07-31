@@ -489,12 +489,20 @@ async function fetchMcpRegistry(query: string, limit = 40): Promise<CatalogItem[
   }
 }
 
-export async function searchCatalog(options?: {
+export interface CatalogSearchOptions {
   q?: string;
   type?: string | null;
   includeRegistry?: boolean;
   take?: number;
-}): Promise<{ items: CatalogItem[]; source: string }> {
+}
+
+/**
+ * Client-safe catalog search (built-ins + remote registries).
+ * Database-backed cache composition lives in catalog-server.ts.
+ */
+export async function searchCatalogLive(
+  options?: CatalogSearchOptions,
+): Promise<{ items: CatalogItem[]; source: string }> {
   const query = options?.q?.trim() ?? "";
   const normalized = query.toLowerCase();
   const type = options?.type;
@@ -507,22 +515,6 @@ export async function searchCatalog(options?: {
   );
 
   const sources = new Set<string>(["mcs-catalog"]);
-
-  // Prefer materialised cache from daily sync; fall back to live APIs.
-  try {
-    const { loadCatalogEntriesFromDb } = await import("@/lib/catalog-sync");
-    const cached = await loadCatalogEntriesFromDb({
-      q: query,
-      type,
-      take: options?.take && options.take > 0 ? options.take : 200,
-    });
-    if (cached.length > 0) {
-      items = dedupeItems([...items, ...cached]);
-      for (const item of cached) sources.add(item.source);
-    }
-  } catch {
-    // DB unavailable — continue with live connectors.
-  }
 
   const wantsMcp = !type || type === "all" || type === "mcp";
   if (includeRegistry && wantsMcp) {

@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 import { ProfileBuilder } from "@/components/profile-builder";
 import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
-import { searchCatalog } from "@/lib/catalog";
+import { searchCatalog } from "@/lib/catalog-server";
 import type { Metadata } from "next";
 import Link from "next/link";
 

@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { searchCatalog } from "@/lib/catalog";
+import { searchCatalog } from "@/lib/catalog-server";
 import {
   listPublicCollections,
   listPublicProfiles,

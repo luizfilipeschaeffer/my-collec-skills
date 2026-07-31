@@ -1,4 +1,4 @@
-import { searchCatalog } from "@/lib/catalog";
+import { searchCatalog } from "@/lib/catalog-server";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
