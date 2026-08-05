@@ -19,6 +19,7 @@ No projeto Vercel (`Root Directory` = `apps/web`), configure:
 | Variável | Produção |
 | --- | --- |
 | `DATABASE_URL` | Connection string Neon (preferir host **pooler** em serverless) |
+| `DIRECT_URL` | Opcional. URL **direta** (sem `-pooler`) usada só pelo `prisma migrate deploy` no build |
 | `AUTH_SECRET` | Segredo forte (`openssl rand -base64 32`) |
 | `AUTH_URL` | URL canônica, ex. `https://seu-app.vercel.app` |
 | `MCS_API_URL` | Mesma URL pública da app |
@@ -86,17 +87,23 @@ npx vercel --prod --yes --scope luizfilipeschaeffers-projects
 
 ## Migrations no Neon
 
-Na raiz do monorepo (com `DATABASE_URL` apontando ao Neon):
+O **build** aplica migrations automaticamente (`pnpm db:migrate:deploy` → `prisma migrate deploy`) antes de gerar o client e compilar a web.
+
+Na Vercel isso roda no `buildCommand`. Localmente, `pnpm build` faz o mesmo.
+
+Se o pooler bloquear DDL, defina `DIRECT_URL` (host sem `-pooler`). O Prisma CLI usa `DIRECT_URL` quando existir; o app em runtime continua em `DATABASE_URL`.
+
+Aplicar na mão (emergência / seed):
 
 ```bash
+pnpm db:migrate:deploy
 pnpm db:generate
-pnpm exec prisma migrate deploy
 pnpm db:seed   # opcional (dados demo)
 ```
 
 ## Build / deploy
 
-`apps/web/vercel.json` já define install/build para monorepo pnpm + Prisma generate.
+`apps/web/vercel.json` define install/build do monorepo: migrate deploy + Prisma generate + Next.js.
 
 ```bash
 cd apps/web
@@ -108,4 +115,4 @@ Ou conecte o repositório GitHub ao projeto Vercel (deploy automático).
 
 ## Neon pooler (recomendado em produção)
 
-No console Neon, copie a connection string **pooled** (host com `-pooler`) para `DATABASE_URL` na Vercel. Use a URL **direta** só para `prisma migrate deploy` se o pooler bloquear migrations.
+No console Neon, copie a connection string **pooled** (host com `-pooler`) para `DATABASE_URL` na Vercel. Se o migrate no build falhar no pooler, adicione também `DIRECT_URL` com a URL direta.
