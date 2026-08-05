@@ -14,6 +14,12 @@ import {
 
 export type CatalogItemType = "skill" | "agent" | "mcp" | "doc";
 
+export type CatalogTaxonomyRef = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
 export type CatalogItem = {
   type: CatalogItemType;
   source: string;
@@ -22,6 +28,10 @@ export type CatalogItem = {
   description: string;
   url?: string;
   metadata?: Record<string, unknown>;
+  id?: string;
+  submittedBy?: { username: string; name: string | null } | null;
+  category?: CatalogTaxonomyRef | null;
+  subcategory?: CatalogTaxonomyRef | null;
 };
 
 function withApplyPayload(
@@ -494,6 +504,8 @@ export interface CatalogSearchOptions {
   type?: string | null;
   includeRegistry?: boolean;
   take?: number;
+  category?: string | null;
+  subcategory?: string | null;
 }
 
 /**

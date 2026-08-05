@@ -1,7 +1,7 @@
 # PRD — My Collec Skills
 
 **Status:** aprovado (MVP)  
-**Última atualização:** 2026-07-30  
+**Última atualização:** 2026-08-05  
 **Stack técnica:** [`docs/STACK.md`](./STACK.md)  
 **Kanban:** [`.devtool/features/`](../.devtool/features/)
 
@@ -259,13 +259,14 @@ CLI e extensão compartilham **ApplyEngine** e o contrato do manifesto.
 | RF-12 | UI web 100% shadcn/ui | `ui-shadcn` |
 | RF-13 | Postgres local + schema Prisma do domínio | `db-local-docker-prisma` |
 | RF-14 | Catálogo/navegação por categorias | `catalog-skills-categories` |
+| RF-15 | Contribuição comunitária de skills/agents/MCPs/docs + taxonomia sugerida | `community-catalog-contribute` |
 
 ### P1
 
 - Flags CLI `--dry-run`, `--force`, `--ide`
 - Publicação extensão no marketplace VS Code
 - Auth/token na CLI para profiles privados
-- Seeds/UI de gestão de categorias custom do usuário
+- Categorias **privadas** por usuário (a contribuição atual cria taxonomia global compartilhada)
 
 ### Requisitos não-funcionais
 

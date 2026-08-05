@@ -8,6 +8,7 @@ import {
   type CatalogItemType,
 } from "@/lib/catalog";
 import { searchCatalog } from "@/lib/catalog-server";
+import { db } from "@mcs/db";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -19,7 +20,13 @@ export const metadata: Metadata = {
 };
 
 type Props = {
-  searchParams: Promise<{ q?: string; type?: string; page?: string }>;
+  searchParams: Promise<{
+    q?: string;
+    type?: string;
+    page?: string;
+    category?: string;
+    subcategory?: string;
+  }>;
 };
 
 const PAGE_SIZE = 48;
@@ -33,13 +40,20 @@ const TYPES: Array<{ value: "all" | CatalogItemType; label: string }> = [
 ];
 
 export default async function CatalogPage({ searchParams }: Props) {
-  const { q, type, page } = await searchParams;
+  const { q, type, page, category, subcategory } = await searchParams;
   const selectedType =
     type === "skill" || type === "agent" || type === "mcp" || type === "doc"
       ? type
       : "all";
 
-  const { items: allItems, source } = await searchCatalog({ q, type: null });
+  const [{ items: allItems, source }, categories] = await Promise.all([
+    searchCatalog({ q, type: null, category, subcategory }),
+    db.category.findMany({
+      include: { subcategories: { orderBy: { name: "asc" } } },
+      orderBy: { name: "asc" },
+    }),
+  ]);
+  const activeCategory = categories.find((item) => item.slug === category);
 
   const typeCounts = {
     all: allItems.length,
@@ -67,6 +81,8 @@ export default async function CatalogPage({ searchParams }: Props) {
   const params = new URLSearchParams();
   if (q) params.set("q", q);
   if (selectedType !== "all") params.set("type", selectedType);
+  if (category) params.set("category", category);
+  if (subcategory) params.set("subcategory", subcategory);
 
   return (
     <div className="min-h-screen">
@@ -91,9 +107,14 @@ export default async function CatalogPage({ searchParams }: Props) {
             {source}.
           </p>
           </div>
-          <Button asChild size="lg">
-            <Link href="/build">Montar meu profile</Link>
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild variant="outline" size="lg">
+              <Link href="/catalog/new">Compartilhar item</Link>
+            </Button>
+            <Button asChild size="lg">
+              <Link href="/build">Montar meu profile</Link>
+            </Button>
+          </div>
         </div>
 
         <Suspense fallback={null}>
@@ -112,6 +133,7 @@ export default async function CatalogPage({ searchParams }: Props) {
                 active={selectedType === item.value}
                 href={buildFilterHref("/catalog", params, {
                   type: item.value === "all" ? null : item.value,
+                  page: null,
                 })}
               >
                 {item.label}
@@ -120,6 +142,68 @@ export default async function CatalogPage({ searchParams }: Props) {
             ))}
           </div>
         </section>
+
+        <section className="space-y-3">
+          <h2 className="text-sm font-medium text-muted-foreground">
+            Categoria
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            <FilterChip
+              active={!category}
+              href={buildFilterHref("/catalog", params, {
+                category: null,
+                subcategory: null,
+                page: null,
+              })}
+            >
+              Todas
+            </FilterChip>
+            {categories.map((item) => (
+              <FilterChip
+                key={item.id}
+                active={category === item.slug}
+                href={buildFilterHref("/catalog", params, {
+                  category: item.slug,
+                  subcategory: null,
+                  page: null,
+                })}
+              >
+                {item.name}
+              </FilterChip>
+            ))}
+          </div>
+        </section>
+
+        {activeCategory ? (
+          <section className="space-y-3">
+            <h2 className="text-sm font-medium text-muted-foreground">
+              Subcategoria · {activeCategory.name}
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              <FilterChip
+                active={!subcategory}
+                href={buildFilterHref("/catalog", params, {
+                  subcategory: null,
+                  page: null,
+                })}
+              >
+                Todas
+              </FilterChip>
+              {activeCategory.subcategories.map((item) => (
+                <FilterChip
+                  key={item.id}
+                  active={subcategory === item.slug}
+                  href={buildFilterHref("/catalog", params, {
+                    subcategory: item.slug,
+                    page: null,
+                  })}
+                >
+                  {item.name}
+                </FilterChip>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         {items.length === 0 ? (
           <div className="rounded-xl border border-dashed p-12 text-center">

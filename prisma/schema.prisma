@@ -27,17 +27,18 @@ enum CatalogEntryType {
 }
 
 model User {
-  id            String         @id @default(cuid())
-  username      String         @unique
-  name          String?
-  email         String?        @unique
-  image         String?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  oauthAccounts OAuthAccount[]
-  apiTokens     ApiToken[]
-  profiles      Profile[]
-  collections   Collection[]
+  id             String         @id @default(cuid())
+  username       String         @unique
+  name           String?
+  email          String?        @unique
+  image          String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  oauthAccounts  OAuthAccount[]
+  apiTokens      ApiToken[]
+  profiles       Profile[]
+  collections    Collection[]
+  catalogEntries CatalogEntry[]
 
   @@index([username])
 }
@@ -58,7 +59,7 @@ model ApiToken {
 }
 
 model OAuthAccount {
-  id                String   @id @default(cuid())
+  id                String    @id @default(cuid())
   userId            String
   provider          String
   providerAccountId String
@@ -67,37 +68,39 @@ model OAuthAccount {
   expiresAt         DateTime?
   tokenType         String?
   scope             String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@index([userId])
 }
 
 model Category {
-  id            String        @id @default(cuid())
-  slug          String        @unique
-  name          String
-  description   String?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  subcategories SubCategory[]
-  collections   Collection[]
+  id             String         @id @default(cuid())
+  slug           String         @unique
+  name           String
+  description    String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  subcategories  SubCategory[]
+  collections    Collection[]
+  catalogEntries CatalogEntry[]
 
   @@index([slug])
 }
 
 model SubCategory {
-  id          String       @id @default(cuid())
-  slug        String
-  name        String
-  description String?
-  categoryId  String
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  category    Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  collections Collection[]
+  id             String         @id @default(cuid())
+  slug           String
+  name           String
+  description    String?
+  categoryId     String
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  category       Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  collections    Collection[]
+  catalogEntries CatalogEntry[]
 
   @@unique([categoryId, slug])
   @@index([categoryId])
@@ -261,24 +264,34 @@ model ProfileExtension {
   @@index([ide])
 }
 
-/// Cached global catalog from built-in, skills.sh, MCP Registry, Claude Code.
+/// Cached global catalog from built-in, skills.sh, MCP Registry, Claude Code,
+/// plus community-submitted entries (`source = "community"`).
 model CatalogEntry {
-  id          String           @id @default(cuid())
-  type        CatalogEntryType
-  source      String
-  externalId  String
-  name        String
-  description String?
-  url         String?
-  metadata    Json?
-  contentHash String?
-  fetchedAt   DateTime         @default(now())
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  id            String           @id @default(cuid())
+  type          CatalogEntryType
+  source        String
+  externalId    String
+  name          String
+  description   String?
+  url           String?
+  metadata      Json?
+  contentHash   String?
+  fetchedAt     DateTime         @default(now())
+  submittedById String?
+  categoryId    String?
+  subcategoryId String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  submittedBy   User?            @relation(fields: [submittedById], references: [id], onDelete: SetNull)
+  category      Category?        @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  subcategory   SubCategory?     @relation(fields: [subcategoryId], references: [id], onDelete: SetNull)
 
   @@unique([source, externalId])
   @@index([type])
   @@index([source])
   @@index([fetchedAt])
   @@index([name])
+  @@index([submittedById])
+  @@index([categoryId])
+  @@index([subcategoryId])
 }

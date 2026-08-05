@@ -39,12 +39,14 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import type { CatalogItem as SharedCatalogItem } from "@/lib/catalog";
 import {
   Boxes,
   Copy,
   FolderPlus,
   Globe2,
   PackageSearch,
+  Pencil,
   Plus,
   Share2,
   Trash2,
@@ -85,26 +87,20 @@ type Profile = {
   >;
 };
 
-type CatalogItem = {
-  type: "skill" | "agent" | "mcp" | "doc";
-  source: string;
-  externalId: string;
-  name: string;
-  description: string;
-  url?: string;
-  metadata?: Record<string, unknown>;
-};
+type CatalogItem = SharedCatalogItem;
 
 export function DashboardClient({
   username,
   initialProfiles,
   initialCollections,
   categories,
+  initialCatalogItems,
 }: {
   username: string;
   initialProfiles: Profile[];
   initialCollections: Collection[];
   categories: Category[];
+  initialCatalogItems: CatalogItem[];
 }) {
   const searchParams = useSearchParams();
   const initialTab = searchParams.get("tab") ?? "profiles";
@@ -114,10 +110,13 @@ export function DashboardClient({
   const [profiles, setProfiles] = useState(initialProfiles);
   const [collections, setCollections] = useState(initialCollections);
   const [activeTab, setActiveTab] = useState(
-    ["profiles", "collections", "catalog", "install"].includes(initialTab)
+    ["profiles", "collections", "catalog", "my-items", "install"].includes(
+      initialTab,
+    )
       ? initialTab
       : "profiles",
   );
+  const [myItems, setMyItems] = useState(initialCatalogItems);
   const [profileDialog, setProfileDialog] = useState(false);
   const [collectionDialog, setCollectionDialog] = useState(false);
   const [catalog, setCatalog] = useState<CatalogItem[]>([]);
@@ -380,10 +379,11 @@ export function DashboardClient({
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid h-auto w-full grid-cols-2 sm:grid-cols-5">
           <TabsTrigger value="profiles">Profiles</TabsTrigger>
           <TabsTrigger value="collections">Coleções</TabsTrigger>
           <TabsTrigger value="catalog">Catálogo</TabsTrigger>
+          <TabsTrigger value="my-items">Meus itens</TabsTrigger>
           <TabsTrigger value="install">Instalar</TabsTrigger>
         </TabsList>
 
@@ -682,6 +682,10 @@ export function DashboardClient({
                 <Link href="/catalog" className="underline underline-offset-4">
                   Ver galeria pública
                 </Link>
+                {" · "}
+                <Link href="/catalog/new" className="underline underline-offset-4">
+                  Compartilhar item
+                </Link>
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-5">
@@ -740,6 +744,79 @@ export function DashboardClient({
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="my-items" className="space-y-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-xl font-semibold">Meus itens públicos</h2>
+              <p className="text-sm text-muted-foreground">
+                Skills, agents, MCPs e docs que você publicou no catálogo.
+              </p>
+            </div>
+            <Button asChild>
+              <Link href="/catalog/new">
+                <Plus className="size-4" /> Publicar
+              </Link>
+            </Button>
+          </div>
+          {myItems.length === 0 ? (
+            <Card>
+              <CardContent className="py-10 text-sm text-muted-foreground">
+                Você ainda não publicou itens. Compartilhe uma skill, MCP ou doc
+                para aparecer no catálogo.
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid gap-3 md:grid-cols-2">
+              {myItems.map((item) => (
+                <Card key={item.id ?? `${item.source}:${item.externalId}`}>
+                  <CardHeader>
+                    <div className="flex flex-wrap gap-2">
+                      <Badge variant="outline">{item.type}</Badge>
+                      {item.category ? (
+                        <Badge variant="secondary">{item.category.name}</Badge>
+                      ) : null}
+                    </div>
+                    <CardTitle className="text-base">{item.name}</CardTitle>
+                    <CardDescription>{item.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex flex-wrap gap-2">
+                    {item.id ? (
+                      <Button asChild size="sm" variant="outline">
+                        <Link href={`/catalog/${item.id}/edit`}>
+                          <Pencil className="size-4" /> Editar
+                        </Link>
+                      </Button>
+                    ) : null}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        if (!item.id) return;
+                        startTransition(async () => {
+                          const response = await fetch(
+                            `/api/catalog/${item.id}`,
+                            { method: "DELETE" },
+                          );
+                          if (!response.ok && response.status !== 204) {
+                            toast.error("Não foi possível remover.");
+                            return;
+                          }
+                          setMyItems((current) =>
+                            current.filter((entry) => entry.id !== item.id),
+                          );
+                          toast.success("Item removido do catálogo.");
+                        });
+                      }}
+                    >
+                      <Trash2 className="size-4" /> Remover
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="install">

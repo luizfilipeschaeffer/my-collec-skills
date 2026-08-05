@@ -141,6 +141,9 @@ export function CatalogItemDetailDialog({
           <div className="flex flex-wrap gap-2 pr-8">
             <Badge>{catalogTypeLabel(item.type)}</Badge>
             <Badge variant="outline">{item.source}</Badge>
+            {item.category ? (
+              <Badge variant="secondary">{item.category.name}</Badge>
+            ) : null}
             {apiVersion ? (
               <Badge variant="outline">API {apiVersion}</Badge>
             ) : null}
@@ -198,6 +201,21 @@ export function CatalogItemDetailDialog({
                 <dt className="text-muted-foreground">Fonte</dt>
                 <dd>{item.source}</dd>
               </div>
+              {item.submittedBy?.username ? (
+                <div className="grid grid-cols-[7rem_1fr] gap-2">
+                  <dt className="text-muted-foreground">Autor</dt>
+                  <dd>@{item.submittedBy.username}</dd>
+                </div>
+              ) : null}
+              {item.category ? (
+                <div className="grid grid-cols-[7rem_1fr] gap-2">
+                  <dt className="text-muted-foreground">Categoria</dt>
+                  <dd>
+                    {item.category.name}
+                    {item.subcategory ? ` / ${item.subcategory.name}` : ""}
+                  </dd>
+                </div>
+              ) : null}
               {repo ? (
                 <div className="grid grid-cols-[7rem_1fr] gap-2">
                   <dt className="text-muted-foreground">Repositório</dt>

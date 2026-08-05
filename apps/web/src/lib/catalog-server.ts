@@ -28,11 +28,23 @@ export async function searchCatalog(
     const cached = await loadCatalogEntriesFromDb({
       q: query,
       type: options?.type,
+      category: options?.category,
+      subcategory: options?.subcategory,
       take: options?.take && options.take > 0 ? options.take : 200,
     });
-    if (cached.length === 0) return live;
+    if (cached.length === 0 && !options?.category && !options?.subcategory) {
+      return live;
+    }
 
-    const items = dedupeItems([...cached, ...live.items]);
+    let items = dedupeItems([...cached, ...live.items]);
+    if (options?.category) {
+      items = items.filter((item) => item.category?.slug === options.category);
+    }
+    if (options?.subcategory) {
+      items = items.filter(
+        (item) => item.subcategory?.slug === options.subcategory,
+      );
+    }
     return {
       items:
         options?.take && options.take > 0

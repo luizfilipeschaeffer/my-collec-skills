@@ -1,5 +1,10 @@
 import { DashboardClient } from "@/components/dashboard-client";
 import { SiteHeader } from "@/components/site-header";
+import {
+  COMMUNITY_CATALOG_SOURCE,
+  catalogEntryInclude,
+  toCatalogItem,
+} from "@/lib/catalog-contribute";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@mcs/db";
 import { redirect } from "next/navigation";
@@ -9,7 +14,7 @@ export default async function DashboardPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  const [profiles, collections, categories] = await Promise.all([
+  const [profiles, collections, categories, myCatalogRows] = await Promise.all([
     db.profile.findMany({
       where: { ownerId: user.id },
       include: {
@@ -41,6 +46,14 @@ export default async function DashboardPage() {
       include: { subcategories: { orderBy: { name: "asc" } } },
       orderBy: { name: "asc" },
     }),
+    db.catalogEntry.findMany({
+      where: {
+        submittedById: user.id,
+        source: COMMUNITY_CATALOG_SOURCE,
+      },
+      include: catalogEntryInclude,
+      orderBy: { updatedAt: "desc" },
+    }),
   ]);
 
   return (
@@ -52,6 +65,7 @@ export default async function DashboardPage() {
           initialProfiles={profiles}
           initialCollections={collections}
           categories={categories}
+          initialCatalogItems={myCatalogRows.map(toCatalogItem)}
         />
       </Suspense>
     </div>

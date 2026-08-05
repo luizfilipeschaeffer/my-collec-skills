@@ -54,7 +54,7 @@ curl -H "Authorization: Bearer $CRON_SECRET" \
   "https://my-collec-skills.vercel.app/api/cron/catalog-sync?phase=all"
 ```
 
-O job **não** sobrescreve conteúdo já salvo pelo usuário nem aplica layout Claude (`.claude/skills`) — só materializa o cache.
+O job **não** sobrescreve conteúdo já salvo pelo usuário, **nem** entradas `source = community` / com `submittedById`, nem aplica layout Claude (`.claude/skills`) — só materializa o cache.
 
 ### Callbacks OAuth
 

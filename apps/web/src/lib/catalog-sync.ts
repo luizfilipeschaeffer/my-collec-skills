@@ -17,6 +17,11 @@ import {
   searchSkillsShV1,
   skillsShHasOidc,
 } from "@/lib/skills-sh";
+import { shouldProtectCatalogEntryFromSync } from "@/lib/catalog-contribute-rules";
+import {
+  catalogEntryInclude,
+  toCatalogItem,
+} from "@/lib/catalog-contribute";
 import { db, type CatalogEntryType, type Prisma } from "@mcs/db";
 
 export type CatalogSyncPhase =
@@ -119,6 +124,11 @@ async function upsertItems(
           },
         },
       });
+
+      if (existing && shouldProtectCatalogEntryFromSync(existing)) {
+        report.unchanged += 1;
+        continue;
+      }
 
       if (existing?.contentHash === hash) {
         await db.catalogEntry.update({
@@ -543,6 +553,9 @@ export async function loadCatalogEntriesFromDb(options?: {
   q?: string;
   type?: string | null;
   take?: number;
+  category?: string | null;
+  subcategory?: string | null;
+  submittedById?: string | null;
 }): Promise<CatalogItem[]> {
   const query = options?.q?.trim().toLowerCase() ?? "";
   const type = options?.type;
@@ -551,6 +564,11 @@ export async function loadCatalogEntriesFromDb(options?: {
     where: {
       ...(type && type !== "all"
         ? { type: type as CatalogEntryType }
+        : {}),
+      ...(options?.submittedById ? { submittedById: options.submittedById } : {}),
+      ...(options?.category ? { category: { slug: options.category } } : {}),
+      ...(options?.subcategory
+        ? { subcategory: { slug: options.subcategory } }
         : {}),
       ...(query
         ? {
@@ -563,19 +581,12 @@ export async function loadCatalogEntriesFromDb(options?: {
           }
         : {}),
     },
+    include: catalogEntryInclude,
     orderBy: { fetchedAt: "desc" },
     take: options?.take && options.take > 0 ? options.take : 200,
   });
 
-  return rows.map((row) => ({
-    type: row.type as CatalogItemType,
-    source: row.source,
-    externalId: row.externalId,
-    name: row.name,
-    description: row.description ?? "",
-    url: row.url ?? undefined,
-    metadata: asMeta(row.metadata),
-  }));
+  return rows.map((row) => toCatalogItem(row));
 }
 
 export async function lookupCatalogEntryMetadata(

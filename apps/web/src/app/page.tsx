@@ -33,7 +33,6 @@ export default async function Home() {
         <section className="border-b">
           <div className="mx-auto grid max-w-6xl gap-10 px-4 py-20 lg:grid-cols-[1.2fr_.8fr] lg:py-28">
             <div className="space-y-6">
-              <Badge variant="secondary">Cursor-first · open source workflow</Badge>
               <h1 className="max-w-3xl text-4xl font-bold tracking-tight sm:text-6xl">
                 Seu ambiente AI-ready, compartilhável e instalável.
               </h1>

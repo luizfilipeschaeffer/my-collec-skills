@@ -46,10 +46,16 @@ export function CatalogItemCard({ item }: { item: CatalogItem }) {
           <div className="flex flex-wrap gap-2">
             <Badge>{catalogTypeLabel(item.type)}</Badge>
             <Badge variant="outline">{item.source}</Badge>
+            {item.category ? (
+              <Badge variant="secondary">{item.category.name}</Badge>
+            ) : null}
           </div>
           <CardTitle className="line-clamp-1">{item.name}</CardTitle>
           <CardDescription className="font-mono text-xs">
             {item.externalId}
+            {item.submittedBy?.username
+              ? ` · @${item.submittedBy.username}`
+              : ""}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex-1 space-y-3">
