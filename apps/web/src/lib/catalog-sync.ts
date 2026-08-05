@@ -22,6 +22,7 @@ import {
   catalogEntryInclude,
   toCatalogItem,
 } from "@/lib/catalog-contribute";
+import { withCatalogUsage } from "@/lib/catalog-usage";
 import { db, type CatalogEntryType, type Prisma } from "@mcs/db";
 
 export type CatalogSyncPhase =
@@ -586,7 +587,7 @@ export async function loadCatalogEntriesFromDb(options?: {
     take: options?.take && options.take > 0 ? options.take : 200,
   });
 
-  return rows.map((row) => toCatalogItem(row));
+  return withCatalogUsage(rows.map((row) => toCatalogItem(row)));
 }
 
 export async function lookupCatalogEntryMetadata(

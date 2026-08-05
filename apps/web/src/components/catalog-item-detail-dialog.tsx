@@ -12,10 +12,12 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CatalogUsageLine } from "@/components/catalog-usage-line";
 import {
   catalogTypeLabel,
   type CatalogItem,
 } from "@/lib/catalog";
+import { isPopularUsage } from "@/lib/catalog-usage-stats";
 import { Check, Copy, ExternalLink, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -152,6 +154,9 @@ export function CatalogItemDetailDialog({
                 {installs.toLocaleString("en-US")} installs
               </Badge>
             ) : null}
+            {isPopularUsage(item.usage) ? (
+              <Badge variant="secondary">Popular</Badge>
+            ) : null}
           </div>
           <DialogTitle className="text-xl leading-snug">{item.name}</DialogTitle>
           <DialogDescription className="font-mono text-xs break-all">
@@ -173,6 +178,7 @@ export function CatalogItemDetailDialog({
                 {description}
               </p>
             )}
+            <CatalogUsageLine usage={item.usage} />
           </section>
 
           {tags.length > 0 ? (
@@ -325,14 +331,14 @@ export function CatalogItemDetailDialog({
                   </>
                 ) : (
                   <>
-                    <Plus className="size-3.5" /> Adicionar ao profile
+                    <Plus className="size-3.5" /> Colecionar
                   </>
                 )}
               </Button>
             ) : (
               <Button asChild size="sm">
                 <Link href={buildHref}>
-                  <Plus className="size-3.5" /> Adicionar ao profile
+                  <Plus className="size-3.5" /> Colecionar
                 </Link>
               </Button>
             )}

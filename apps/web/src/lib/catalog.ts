@@ -2,6 +2,7 @@ import {
   catalogContents,
   catalogMcpServers,
 } from "@/lib/catalog-content";
+import type { UsageStats } from "@/lib/catalog-usage-stats";
 import {
   buildInstallCommand,
   listSkillsShCurated,
@@ -20,6 +21,117 @@ export type CatalogTaxonomyRef = {
   slug: string;
 };
 
+function tax(
+  category: readonly [slug: string, name: string],
+  subcategory: readonly [slug: string, name: string],
+): Pick<CatalogItem, "category" | "subcategory"> {
+  return {
+    category: {
+      id: category[0],
+      slug: category[0],
+      name: category[1],
+    },
+    subcategory: {
+      id: `${category[0]}/${subcategory[0]}`,
+      slug: subcategory[0],
+      name: subcategory[1],
+    },
+  };
+}
+
+const builtInTaxonomy: Record<
+  string,
+  Pick<CatalogItem, "category" | "subcategory">
+> = {
+  "nextjs-app-router": tax(["nextjs", "Next.js"], ["app-router", "App Router"]),
+  "prisma-schema-conventions": tax(
+    ["databases", "Databases"],
+    ["prisma", "Prisma"],
+  ),
+  "shadcn-ui-patterns": tax(["design-ui", "Design & UI"], ["shadcn", "shadcn/ui"]),
+  "tailwind-layout": tax(["design-ui", "Design & UI"], ["components", "Components"]),
+  "authjs-oauth": tax(["cybersecurity", "Cybersecurity"], ["auth", "Auth"]),
+  "api-route-design": tax(["nextjs", "Next.js"], ["app-router", "App Router"]),
+  "postgres-indexing": tax(
+    ["databases", "Databases"],
+    ["postgresql", "PostgreSQL"],
+  ),
+  "a11y-checklists": tax(
+    ["accessibility", "Accessibility"],
+    ["wcag", "WCAG"],
+  ),
+  "secure-secrets": tax(
+    ["cybersecurity", "Cybersecurity"],
+    ["secrets", "Secrets"],
+  ),
+  "cursor-skills-authoring": tax(
+    ["agent-workflows", "Agent workflows"],
+    ["skill-authoring", "Skill authoring"],
+  ),
+  "code-reviewer": tax(
+    ["agent-workflows", "Agent workflows"],
+    ["debugging", "Debugging"],
+  ),
+  "security-reviewer": tax(
+    ["cybersecurity", "Cybersecurity"],
+    ["owasp", "OWASP"],
+  ),
+  "prisma-migrator": tax(["databases", "Databases"], ["migrations", "Migrations"]),
+  "ux-copy-editor": tax(["marketing", "Marketing"], ["copywriting", "Copywriting"]),
+  "test-strategist": tax(["testing", "Testing"], ["unit", "Unit"]),
+  "api-contract-guardian": tax(
+    ["nextjs", "Next.js"],
+    ["app-router", "App Router"],
+  ),
+  "io.github.modelcontextprotocol/server-filesystem": tax(
+    ["mcp-integrations", "MCP Integrations"],
+    ["filesystem", "Filesystem"],
+  ),
+  "io.github.modelcontextprotocol/server-github": tax(
+    ["mcp-integrations", "MCP Integrations"],
+    ["github", "GitHub"],
+  ),
+  "io.github.modelcontextprotocol/server-postgres": tax(
+    ["mcp-integrations", "MCP Integrations"],
+    ["database", "Database"],
+  ),
+  "io.github.modelcontextprotocol/server-memory": tax(
+    ["agent-workflows", "Agent workflows"],
+    ["planning", "Planning"],
+  ),
+  "io.github.modelcontextprotocol/server-brave-search": tax(
+    ["mcp-integrations", "MCP Integrations"],
+    ["search", "Search"],
+  ),
+  "vercel-mcp": tax(
+    ["mcp-integrations", "MCP Integrations"],
+    ["deploy", "Deploy"],
+  ),
+  "prisma-mcp": tax(
+    ["mcp-integrations", "MCP Integrations"],
+    ["database", "Database"],
+  ),
+  "stripe-mcp": tax(
+    ["mcp-integrations", "MCP Integrations"],
+    ["deploy", "Deploy"],
+  ),
+  "nextjs-docs": tax(
+    ["documentation", "Documentation"],
+    ["frameworks", "Frameworks"],
+  ),
+  "prisma-docs": tax(["documentation", "Documentation"], ["orm", "ORM"]),
+  "authjs-docs": tax(["documentation", "Documentation"], ["auth", "Auth"]),
+  "shadcn-docs": tax(
+    ["documentation", "Documentation"],
+    ["frameworks", "Frameworks"],
+  ),
+  "mcp-spec": tax(["documentation", "Documentation"], ["protocols", "Protocols"]),
+  "tailwind-docs": tax(
+    ["documentation", "Documentation"],
+    ["frameworks", "Frameworks"],
+  ),
+};
+
 export type CatalogItem = {
   type: CatalogItemType;
   source: string;
@@ -32,6 +144,7 @@ export type CatalogItem = {
   submittedBy?: { username: string; name: string | null } | null;
   category?: CatalogTaxonomyRef | null;
   subcategory?: CatalogTaxonomyRef | null;
+  usage?: UsageStats;
 };
 
 function withApplyPayload(
@@ -313,8 +426,12 @@ const builtInCatalogSeed: CatalogItem[] = [
   },
 ];
 
-export const builtInCatalog: CatalogItem[] =
-  builtInCatalogSeed.map(withApplyPayload);
+export const builtInCatalog: CatalogItem[] = builtInCatalogSeed.map((item) =>
+  withApplyPayload({
+    ...item,
+    ...builtInTaxonomy[item.externalId],
+  }),
+);
 
 type RegistryServer = {
   server?: {
@@ -506,6 +623,7 @@ export interface CatalogSearchOptions {
   take?: number;
   category?: string | null;
   subcategory?: string | null;
+  sort?: "recent" | "popular";
 }
 
 /**

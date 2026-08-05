@@ -8,6 +8,7 @@ import {
   type CatalogItemType,
 } from "@/lib/catalog";
 import { searchCatalog } from "@/lib/catalog-server";
+import { getTaxonomyIcon } from "@/lib/taxonomy-icons";
 import { db } from "@mcs/db";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -26,6 +27,7 @@ type Props = {
     page?: string;
     category?: string;
     subcategory?: string;
+    sort?: string;
   }>;
 };
 
@@ -40,14 +42,15 @@ const TYPES: Array<{ value: "all" | CatalogItemType; label: string }> = [
 ];
 
 export default async function CatalogPage({ searchParams }: Props) {
-  const { q, type, page, category, subcategory } = await searchParams;
+  const { q, type, page, category, subcategory, sort } = await searchParams;
+  const selectedSort = sort === "popular" ? "popular" : "recent";
   const selectedType =
     type === "skill" || type === "agent" || type === "mcp" || type === "doc"
       ? type
       : "all";
 
   const [{ items: allItems, source }, categories] = await Promise.all([
-    searchCatalog({ q, type: null, category, subcategory }),
+    searchCatalog({ q, type: null, category, subcategory, sort: selectedSort }),
     db.category.findMany({
       include: { subcategories: { orderBy: { name: "asc" } } },
       orderBy: { name: "asc" },
@@ -83,6 +86,7 @@ export default async function CatalogPage({ searchParams }: Props) {
   if (selectedType !== "all") params.set("type", selectedType);
   if (category) params.set("category", category);
   if (subcategory) params.set("subcategory", subcategory);
+  if (selectedSort === "popular") params.set("sort", "popular");
 
   return (
     <div className="min-h-screen">
@@ -125,12 +129,39 @@ export default async function CatalogPage({ searchParams }: Props) {
         </Suspense>
 
         <section className="space-y-3">
+          <h2 className="text-sm font-medium text-muted-foreground">Ordenar</h2>
+          <div className="flex flex-wrap gap-2">
+            <FilterChip
+              active={selectedSort === "recent"}
+              icon={getTaxonomyIcon("recent")}
+              href={buildFilterHref("/catalog", params, {
+                sort: null,
+                page: null,
+              })}
+            >
+              Recentes
+            </FilterChip>
+            <FilterChip
+              active={selectedSort === "popular"}
+              icon={getTaxonomyIcon("popular")}
+              href={buildFilterHref("/catalog", params, {
+                sort: "popular",
+                page: null,
+              })}
+            >
+              Popular
+            </FilterChip>
+          </div>
+        </section>
+
+        <section className="space-y-3">
           <h2 className="text-sm font-medium text-muted-foreground">Tipo</h2>
           <div className="flex flex-wrap gap-2">
             {TYPES.map((item) => (
               <FilterChip
                 key={item.value}
                 active={selectedType === item.value}
+                icon={getTaxonomyIcon(item.value)}
                 href={buildFilterHref("/catalog", params, {
                   type: item.value === "all" ? null : item.value,
                   page: null,
@@ -150,6 +181,7 @@ export default async function CatalogPage({ searchParams }: Props) {
           <div className="flex flex-wrap gap-2">
             <FilterChip
               active={!category}
+              icon={getTaxonomyIcon("all")}
               href={buildFilterHref("/catalog", params, {
                 category: null,
                 subcategory: null,
@@ -162,6 +194,7 @@ export default async function CatalogPage({ searchParams }: Props) {
               <FilterChip
                 key={item.id}
                 active={category === item.slug}
+                icon={getTaxonomyIcon(item.slug)}
                 href={buildFilterHref("/catalog", params, {
                   category: item.slug,
                   subcategory: null,
@@ -182,6 +215,7 @@ export default async function CatalogPage({ searchParams }: Props) {
             <div className="flex flex-wrap gap-2">
               <FilterChip
                 active={!subcategory}
+                icon={getTaxonomyIcon("all")}
                 href={buildFilterHref("/catalog", params, {
                   subcategory: null,
                   page: null,
@@ -193,6 +227,7 @@ export default async function CatalogPage({ searchParams }: Props) {
                 <FilterChip
                   key={item.id}
                   active={subcategory === item.slug}
+                  icon={getTaxonomyIcon(item.slug)}
                   href={buildFilterHref("/catalog", params, {
                     subcategory: item.slug,
                     page: null,

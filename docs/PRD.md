@@ -132,7 +132,9 @@ Mesmo padrão para **skills**, **agents** e **MCPs**:
 - Toda Collection exige `categoryId` + `subcategoryId` (subcategoria deve pertencer à categoria)
 - Subcategorias são **compartilhadas** entre tipos; a Collection diferencia pelo `type`
 - Coleções são reutilizáveis e anexáveis a N profiles
+- Coleções **públicas** podem ser **colecionadas** por referência (`ProfileCollection`) — sem copiar/fork e sem o termo “adotar”
 - Itens avulsos no Profile (`ProfileSkill` / `ProfileAgent` / `ProfileMcp`) continuam permitidos além das coleções
+- Catálogo e galerias exibem prova social: **N colecionadores**, **N profiles**, **N coleções** (uso público, chave `source + externalId`)
 
 ### Seeds iniciais
 
@@ -260,6 +262,7 @@ CLI e extensão compartilham **ApplyEngine** e o contrato do manifesto.
 | RF-13 | Postgres local + schema Prisma do domínio | `db-local-docker-prisma` |
 | RF-14 | Catálogo/navegação por categorias | `catalog-skills-categories` |
 | RF-15 | Contribuição comunitária de skills/agents/MCPs/docs + taxonomia sugerida | `community-catalog-contribute` |
+| RF-16 | Prova social de uso + colecionar coleção pública por referência | `collect-usage-metrics` |
 
 ### P1
 
@@ -449,6 +452,8 @@ Marketplace avançado, monetização, sync multi-device, IDEs além de Cursor/VS
 | [`cli-mcs-install`](../.devtool/features/cli-mcs-install-2026-07-30.md) | P0 | §7 |
 | [`ide-extension-mcs`](../.devtool/features/ide-extension-mcs-2026-07-30.md) | P0 | §8 |
 | [`apply-profile-local`](../.devtool/features/apply-profile-local-2026-07-30.md) | P0 | §11 |
+| [`community-catalog-contribute`](../.devtool/features/done/community-catalog-contribute-2026-08-05.md) | P0 | §10 RF-15 |
+| [`collect-usage-metrics`](../.devtool/features/done/collect-usage-metrics-2026-08-05.md) | P0 | §10 RF-16 |
 
 ### Critério de pronto (M0)
 

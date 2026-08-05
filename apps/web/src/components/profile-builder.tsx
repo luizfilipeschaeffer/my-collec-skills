@@ -1,6 +1,7 @@
 "use client";
 
 import { CatalogItemDetailDialog } from "@/components/catalog-item-detail-dialog";
+import { CatalogUsageLine } from "@/components/catalog-usage-line";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +22,7 @@ import {
   type CatalogItem,
   type CatalogItemType,
 } from "@/lib/catalog";
+import { isPopularUsage } from "@/lib/catalog-usage-stats";
 import { cn } from "@/lib/utils";
 import {
   Check,
@@ -129,11 +131,13 @@ export function ProfileBuilder({
   loggedIn,
   username,
   initialAddKey,
+  initialCollectCollectionId,
 }: {
   items: CatalogItem[];
   loggedIn: boolean;
   username?: string | null;
   initialAddKey?: string | null;
+  initialCollectCollectionId?: string | null;
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -279,9 +283,10 @@ export function ProfileBuilder({
 
     if (!loggedIn) {
       writeDraft({ name, slug, description, isPublic, selectedKeys });
-      router.push(
-        `/login?callbackUrl=${encodeURIComponent("/build")}`,
-      );
+      const callback = initialCollectCollectionId
+        ? `/build?collectCollection=${encodeURIComponent(initialCollectCollectionId)}`
+        : "/build";
+      router.push(`/login?callbackUrl=${encodeURIComponent(callback)}`);
       return;
     }
 
@@ -335,7 +340,9 @@ export function ProfileBuilder({
           slug: slug.trim(),
           description: description.trim() || null,
           isPublic,
-          collectionIds: [],
+          collectionIds: initialCollectCollectionId
+            ? [initialCollectCollectionId]
+            : [],
           skills,
           agents,
           mcps,
@@ -372,6 +379,11 @@ export function ProfileBuilder({
                 Adicione skills, agents, MCPs e documentação ao seu profile.
                 Compartilhe publicamente ou mantenha privado.
               </p>
+              {initialCollectCollectionId ? (
+                <p className="text-sm text-foreground">
+                  A coleção escolhida será anexada a este profile ao criar.
+                </p>
+              ) : null}
             </div>
           </div>
         </div>
@@ -409,7 +421,7 @@ export function ProfileBuilder({
                 role="button"
                 tabIndex={0}
                 className={cn(
-                  "cursor-pointer transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  "cursor-pointer outline-none transition-[transform,box-shadow,background-color,border-color] duration-150 ease-out hover:-translate-y-0.5 hover:shadow-sm focus-visible:ring-2 focus-visible:ring-ring",
                   selected && "border-primary bg-primary/5",
                 )}
                 onClick={() => setDetailItem(item)}
@@ -420,11 +432,22 @@ export function ProfileBuilder({
                   }
                 }}
               >
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-2">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex flex-wrap gap-2">
                       <Badge>{catalogTypeLabel(item.type)}</Badge>
                       <Badge variant="outline">{item.source}</Badge>
+                      {item.category ? (
+                        <Badge variant="secondary">
+                          {item.category.name}
+                          {item.subcategory ? ` / ${item.subcategory.name}` : ""}
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline">Sem categoria</Badge>
+                      )}
+                      {isPopularUsage(item.usage) ? (
+                        <Badge variant="secondary">Popular</Badge>
+                      ) : null}
                     </div>
                     <button
                       type="button"
@@ -456,6 +479,9 @@ export function ProfileBuilder({
                     {item.description}
                   </CardDescription>
                 </CardHeader>
+                <CardContent className="pt-0">
+                  <CatalogUsageLine usage={item.usage} />
+                </CardContent>
               </Card>
             );
           })}
@@ -624,7 +650,14 @@ export function ProfileBuilder({
             {!loggedIn ? (
               <p className="text-center text-xs text-muted-foreground">
                 Seu rascunho fica salvo neste navegador.{" "}
-                <Link href="/login?callbackUrl=%2Fbuild" className="underline">
+                <Link
+                  href={`/login?callbackUrl=${encodeURIComponent(
+                    initialCollectCollectionId
+                      ? `/build?collectCollection=${initialCollectCollectionId}`
+                      : "/build",
+                  )}`}
+                  className="underline"
+                >
                   Já tem conta?
                 </Link>
               </p>

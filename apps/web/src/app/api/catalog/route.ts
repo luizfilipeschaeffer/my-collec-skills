@@ -7,6 +7,7 @@ import {
 } from "@/lib/catalog-contribute";
 import { searchCatalog } from "@/lib/catalog-server";
 import { loadCatalogEntriesFromDb } from "@/lib/catalog-sync";
+import { withCatalogUsage } from "@/lib/catalog-usage";
 import { getCurrentUser } from "@/lib/current-user";
 
 export async function GET(request: Request) {
@@ -16,20 +17,24 @@ export async function GET(request: Request) {
   const category = url.searchParams.get("category");
   const subcategory = url.searchParams.get("subcategory");
   const mine = url.searchParams.get("mine") === "1";
+  const sort =
+    url.searchParams.get("sort") === "popular" ? "popular" : undefined;
   const takeParam = url.searchParams.get("take");
   const take = takeParam ? Number(takeParam) : undefined;
 
   if (mine) {
     const user = await getCurrentUser();
     if (!user) return unauthorized();
-    const items = await loadCatalogEntriesFromDb({
-      q: query,
-      type,
-      category,
-      subcategory,
-      submittedById: user.id,
-      take: Number.isFinite(take) ? take : 200,
-    });
+    const items = await withCatalogUsage(
+      await loadCatalogEntriesFromDb({
+        q: query,
+        type,
+        category,
+        subcategory,
+        submittedById: user.id,
+        take: Number.isFinite(take) ? take : 200,
+      }),
+    );
     return Response.json({
       items,
       query,
@@ -43,6 +48,7 @@ export async function GET(request: Request) {
     type,
     category,
     subcategory,
+    sort,
     take: Number.isFinite(take) ? take : undefined,
   });
 

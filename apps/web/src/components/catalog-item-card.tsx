@@ -11,10 +11,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { CatalogUsageLine } from "@/components/catalog-usage-line";
 import {
   catalogTypeLabel,
   type CatalogItem,
 } from "@/lib/catalog";
+import { isPopularUsage } from "@/lib/catalog-usage-stats";
 import { ExternalLink, Plus } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -33,7 +35,7 @@ export function CatalogItemCard({ item }: { item: CatalogItem }) {
       <Card
         role="button"
         tabIndex={0}
-        className="flex h-full cursor-pointer flex-col outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring"
+        className="flex h-full cursor-pointer flex-col outline-none transition-[transform,box-shadow,border-color] duration-150 ease-out hover:-translate-y-1 hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.99]"
         onClick={() => setOpen(true)}
         onKeyDown={(event) => {
           if (event.key === "Enter" || event.key === " ") {
@@ -49,6 +51,9 @@ export function CatalogItemCard({ item }: { item: CatalogItem }) {
             {item.category ? (
               <Badge variant="secondary">{item.category.name}</Badge>
             ) : null}
+            {isPopularUsage(item.usage) ? (
+              <Badge variant="secondary">Popular</Badge>
+            ) : null}
           </div>
           <CardTitle className="line-clamp-1">{item.name}</CardTitle>
           <CardDescription className="font-mono text-xs">
@@ -58,10 +63,11 @@ export function CatalogItemCard({ item }: { item: CatalogItem }) {
               : ""}
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex-1 space-y-3">
+        <CardContent className="flex flex-1 flex-col gap-3">
           <p className="line-clamp-3 text-sm text-muted-foreground">
             {item.description}
           </p>
+          <CatalogUsageLine usage={item.usage} />
           {tags.length > 0 ? (
             <div className="flex flex-wrap gap-1.5">
               {tags.slice(0, 4).map((tag) => (
@@ -89,7 +95,7 @@ export function CatalogItemCard({ item }: { item: CatalogItem }) {
           )}
           <Button asChild size="sm">
             <Link href={buildHref} onClick={(event) => event.stopPropagation()}>
-              <Plus className="size-4" /> Adicionar
+              <Plus className="size-4" /> Colecionar
             </Link>
           </Button>
         </CardFooter>

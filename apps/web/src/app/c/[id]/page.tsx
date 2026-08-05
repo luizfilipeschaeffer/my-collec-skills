@@ -1,3 +1,5 @@
+import { CollectCollectionButton } from "@/components/collect-collection-button";
+import { CollectionUsageLine } from "@/components/catalog-usage-line";
 import { SiteHeader } from "@/components/site-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,6 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { isPopularUsage } from "@/lib/catalog-usage-stats";
 import { getPublicCollection } from "@/lib/public-gallery";
 import { ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
@@ -50,6 +53,9 @@ export default async function PublicCollectionPage({ params }: Props) {
               {collection.category.name} / {collection.subcategory.name}
             </Badge>
             <Badge variant="secondary">@{collection.owner.username}</Badge>
+            {isPopularUsage(collection.usage) ? (
+              <Badge variant="secondary">Popular</Badge>
+            ) : null}
           </div>
           <h1 className="text-4xl font-bold tracking-tight">
             {collection.name}
@@ -58,9 +64,13 @@ export default async function PublicCollectionPage({ params }: Props) {
             {collection.description ??
               "Coleção pública compartilhada no My Collec Skills."}
           </p>
-          <Button asChild variant="outline">
-            <Link href="/collections">Voltar à galeria</Link>
-          </Button>
+          <CollectionUsageLine usage={collection.usage} />
+          <div className="flex flex-wrap gap-2">
+            <CollectCollectionButton collectionId={collection.id} />
+            <Button asChild variant="outline">
+              <Link href="/collections">Voltar à galeria</Link>
+            </Button>
+          </div>
         </div>
 
         <section className="space-y-4">

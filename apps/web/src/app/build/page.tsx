@@ -13,12 +13,18 @@ export const metadata: Metadata = {
 };
 
 type Props = {
-  searchParams: Promise<{ add?: string | string[] }>;
+  searchParams: Promise<{
+    add?: string | string[];
+    collectCollection?: string | string[];
+  }>;
 };
 
 export default async function BuildPage({ searchParams }: Props) {
-  const { add } = await searchParams;
+  const { add, collectCollection } = await searchParams;
   const initialAddKey = Array.isArray(add) ? add[0] : add;
+  const initialCollectCollectionId = Array.isArray(collectCollection)
+    ? collectCollection[0]
+    : collectCollection;
   const session = await auth();
   const { items } = await searchCatalog({ type: null });
 
@@ -49,6 +55,7 @@ export default async function BuildPage({ searchParams }: Props) {
           loggedIn={Boolean(session?.user)}
           username={session?.user?.username}
           initialAddKey={initialAddKey}
+          initialCollectCollectionId={initialCollectCollectionId}
         />
       </main>
     </div>

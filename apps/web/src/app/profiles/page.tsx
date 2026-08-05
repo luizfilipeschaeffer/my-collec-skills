@@ -1,4 +1,5 @@
 import { FilterChip, buildFilterHref } from "@/components/filter-chip";
+import { getTaxonomyIcon } from "@/lib/taxonomy-icons";
 import { GallerySearch } from "@/components/gallery-search";
 import { ProfileGalleryCard } from "@/components/profile-gallery-card";
 import { SiteHeader } from "@/components/site-header";
@@ -44,7 +45,11 @@ export default async function ProfilesGalleryPage({ searchParams }: Props) {
               placeholder="Buscar por nome, slug ou autor…"
             />
           </Suspense>
-          <FilterChip href={buildFilterHref("/profiles", params, { q: null })} active={!q}>
+          <FilterChip
+            href={buildFilterHref("/profiles", params, { q: null })}
+            active={!q}
+            icon={getTaxonomyIcon("all")}
+          >
             Todos
           </FilterChip>
         </div>

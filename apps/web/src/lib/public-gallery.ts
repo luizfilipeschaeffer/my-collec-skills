@@ -1,3 +1,7 @@
+import {
+  loadCollectionUsage,
+  type CollectionUsageStats,
+} from "@/lib/catalog-usage";
 import { db, type CollectionType } from "@mcs/db";
 
 export async function listPublicProfiles(options?: {
@@ -43,12 +47,14 @@ export async function listPublicCollections(options?: {
   category?: string;
   subcategory?: string;
   take?: number;
+  sort?: "recent" | "popular";
 }) {
   const q = options?.q?.trim();
   const type =
     options?.type && options.type !== "all" ? options.type : undefined;
+  const take = options?.take ?? 48;
 
-  return db.collection.findMany({
+  const collections = await db.collection.findMany({
     where: {
       isPublic: true,
       ...(type ? { type } : {}),
@@ -74,12 +80,29 @@ export async function listPublicCollections(options?: {
       _count: { select: { profiles: true, items: true } },
     },
     orderBy: { updatedAt: "desc" },
-    take: options?.take ?? 48,
+    take: options?.sort === "popular" ? Math.max(take, 200) : take,
   });
+
+  const usage = await loadCollectionUsage(collections.map((item) => item.id));
+  const withUsage = collections.map((collection) => ({
+    ...collection,
+    usage: usage.get(collection.id) ?? { collectors: 0, profiles: 0 },
+  }));
+
+  if (options?.sort === "popular") {
+    withUsage.sort(
+      (left, right) =>
+        right.usage.collectors - left.usage.collectors ||
+        right.usage.profiles - left.usage.profiles,
+    );
+    return withUsage.slice(0, take);
+  }
+
+  return withUsage;
 }
 
 export async function getPublicCollection(id: string) {
-  return db.collection.findFirst({
+  const collection = await db.collection.findFirst({
     where: { id, isPublic: true },
     include: {
       owner: true,
@@ -96,6 +119,16 @@ export async function getPublicCollection(id: string) {
       },
     },
   });
+  if (!collection) return null;
+
+  const usageMap = await loadCollectionUsage([collection.id]);
+  return {
+    ...collection,
+    usage: usageMap.get(collection.id) ?? {
+      collectors: 0,
+      profiles: collection.profiles.length,
+    } satisfies CollectionUsageStats,
+  };
 }
 
 export async function listCategoriesWithCounts() {

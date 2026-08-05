@@ -144,6 +144,7 @@ model CollectionItem {
 
   @@unique([collectionId, source, externalId])
   @@index([collectionId])
+  @@index([source, externalId])
 }
 
 model Profile {
@@ -196,6 +197,7 @@ model ProfileSkill {
 
   @@unique([profileId, source, externalId])
   @@index([profileId])
+  @@index([source, externalId])
 }
 
 model ProfileMcp {
@@ -212,6 +214,7 @@ model ProfileMcp {
 
   @@unique([profileId, source, externalId])
   @@index([profileId])
+  @@index([source, externalId])
 }
 
 model ProfileDoc {
@@ -229,6 +232,7 @@ model ProfileDoc {
 
   @@unique([profileId, source, externalId])
   @@index([profileId])
+  @@index([source, externalId])
 }
 
 model ProfileAgent {
@@ -245,6 +249,7 @@ model ProfileAgent {
 
   @@unique([profileId, source, externalId])
   @@index([profileId])
+  @@index([source, externalId])
 }
 
 model ProfileExtension {

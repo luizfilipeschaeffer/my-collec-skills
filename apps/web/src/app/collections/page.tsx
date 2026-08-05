@@ -7,6 +7,7 @@ import {
   listCategoriesWithCounts,
   listPublicCollections,
 } from "@/lib/public-gallery";
+import { getTaxonomyIcon } from "@/lib/taxonomy-icons";
 import type { CollectionType } from "@mcs/db";
 import type { Metadata } from "next";
 import { Suspense } from "react";
@@ -23,6 +24,7 @@ type Props = {
     type?: string;
     category?: string;
     subcategory?: string;
+    sort?: string;
   }>;
 };
 
@@ -34,9 +36,10 @@ const TYPES: Array<{ value: "all" | CollectionType; label: string }> = [
 ];
 
 export default async function CollectionsGalleryPage({ searchParams }: Props) {
-  const { q, type, category, subcategory } = await searchParams;
+  const { q, type, category, subcategory, sort } = await searchParams;
   const selectedType =
     type === "skill" || type === "agent" || type === "mcp" ? type : "all";
+  const selectedSort = sort === "popular" ? "popular" : "recent";
 
   const [collections, categories] = await Promise.all([
     listPublicCollections({
@@ -44,6 +47,7 @@ export default async function CollectionsGalleryPage({ searchParams }: Props) {
       type: selectedType,
       category,
       subcategory,
+      sort: selectedSort,
     }),
     listCategoriesWithCounts(),
   ]);
@@ -53,6 +57,7 @@ export default async function CollectionsGalleryPage({ searchParams }: Props) {
   if (selectedType !== "all") params.set("type", selectedType);
   if (category) params.set("category", category);
   if (subcategory) params.set("subcategory", subcategory);
+  if (selectedSort === "popular") params.set("sort", "popular");
 
   const activeCategory = categories.find((item) => item.slug === category);
   const totalCollections = categories.reduce(
@@ -83,12 +88,33 @@ export default async function CollectionsGalleryPage({ searchParams }: Props) {
         </Suspense>
 
         <section className="space-y-3">
+          <h2 className="text-sm font-medium text-muted-foreground">Ordenar</h2>
+          <div className="flex flex-wrap gap-2">
+            <FilterChip
+              active={selectedSort === "recent"}
+              icon={getTaxonomyIcon("recent")}
+              href={buildFilterHref("/collections", params, { sort: null })}
+            >
+              Recentes
+            </FilterChip>
+            <FilterChip
+              active={selectedSort === "popular"}
+              icon={getTaxonomyIcon("popular")}
+              href={buildFilterHref("/collections", params, { sort: "popular" })}
+            >
+              Popular
+            </FilterChip>
+          </div>
+        </section>
+
+        <section className="space-y-3">
           <h2 className="text-sm font-medium text-muted-foreground">Tipo</h2>
           <div className="flex flex-wrap gap-2">
             {TYPES.map((item) => (
               <FilterChip
                 key={item.value}
                 active={selectedType === item.value}
+                icon={getTaxonomyIcon(item.value)}
                 href={buildFilterHref("/collections", params, {
                   type: item.value === "all" ? null : item.value,
                 })}
@@ -110,6 +136,7 @@ export default async function CollectionsGalleryPage({ searchParams }: Props) {
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <CategoryFilterCard
               active={!category}
+              slug="all"
               href={buildFilterHref("/collections", params, {
                 category: null,
                 subcategory: null,
@@ -122,6 +149,7 @@ export default async function CollectionsGalleryPage({ searchParams }: Props) {
               <CategoryFilterCard
                 key={item.id}
                 active={category === item.slug}
+                slug={item.slug}
                 href={buildFilterHref("/collections", params, {
                   category: item.slug,
                   subcategory: null,
@@ -145,6 +173,7 @@ export default async function CollectionsGalleryPage({ searchParams }: Props) {
             <div className="flex flex-wrap gap-2">
               <FilterChip
                 active={!subcategory}
+                icon={getTaxonomyIcon("all")}
                 href={buildFilterHref("/collections", params, {
                   subcategory: null,
                 })}
@@ -155,6 +184,7 @@ export default async function CollectionsGalleryPage({ searchParams }: Props) {
                 <FilterChip
                   key={item.id}
                   active={subcategory === item.slug}
+                  icon={getTaxonomyIcon(item.slug)}
                   href={buildFilterHref("/collections", params, {
                     subcategory: item.slug,
                   })}

@@ -1,28 +1,36 @@
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 
 export function FilterChip({
   href,
   active,
+  icon: Icon,
   children,
 }: {
   href: string;
   active?: boolean;
+  icon?: LucideIcon;
   children: React.ReactNode;
 }) {
   return (
-    <Link href={href}>
-      <Badge
-        variant={active ? "default" : "outline"}
-        className={cn(
-          "cursor-pointer px-3 py-1 text-sm transition-colors",
-          !active && "hover:bg-accent",
-        )}
-      >
+    <Button
+      asChild
+      size="sm"
+      variant={active ? "default" : "outline"}
+      className={cn(
+        "transition-[transform,box-shadow,background-color,border-color,color] duration-150 ease-out",
+        "hover:-translate-y-0.5 hover:shadow-sm",
+        "active:scale-[0.96] active:translate-y-0",
+        active && "shadow-sm",
+      )}
+    >
+      <Link href={href} aria-current={active ? "page" : undefined}>
+        {Icon ? <Icon data-icon="inline-start" /> : null}
         {children}
-      </Badge>
-    </Link>
+      </Link>
+    </Button>
   );
 }
 

@@ -1,4 +1,8 @@
 import { apiError, unauthorized } from "@/lib/api";
+import {
+  AttachableCollectionError,
+  assertAttachableCollectionIds,
+} from "@/lib/catalog-usage";
 import { getCurrentUser } from "@/lib/current-user";
 import { profileInputSchema } from "@/lib/schemas";
 import { db, Prisma } from "@mcs/db";
@@ -37,14 +41,13 @@ export async function POST(request: Request) {
     if (!user) return unauthorized();
     const input = profileInputSchema.parse(await request.json());
 
-    const ownedCollections = await db.collection.count({
-      where: { id: { in: input.collectionIds }, ownerId: user.id },
-    });
-    if (ownedCollections !== input.collectionIds.length) {
-      return Response.json(
-        { error: "Uma ou mais coleções não pertencem ao usuário." },
-        { status: 400 },
-      );
+    try {
+      await assertAttachableCollectionIds(user.id, input.collectionIds);
+    } catch (error) {
+      if (error instanceof AttachableCollectionError) {
+        return Response.json({ error: error.message }, { status: error.status });
+      }
+      throw error;
     }
 
     const profile = await db.profile.create({

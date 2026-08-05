@@ -1,4 +1,8 @@
 import { apiError, notFound, unauthorized } from "@/lib/api";
+import {
+  AttachableCollectionError,
+  assertAttachableCollectionIds,
+} from "@/lib/catalog-usage";
 import { getCurrentUser } from "@/lib/current-user";
 import { profilePatchSchema } from "@/lib/schemas";
 import { db, Prisma } from "@mcs/db";
@@ -38,14 +42,16 @@ export async function PATCH(request: Request, { params }: Context) {
     const input = profilePatchSchema.parse(await request.json());
 
     if (input.collectionIds) {
-      const owned = await db.collection.count({
-        where: { id: { in: input.collectionIds }, ownerId: user.id },
-      });
-      if (owned !== input.collectionIds.length) {
-        return Response.json(
-          { error: "Uma ou mais coleções não pertencem ao usuário." },
-          { status: 400 },
-        );
+      try {
+        await assertAttachableCollectionIds(user.id, input.collectionIds);
+      } catch (error) {
+        if (error instanceof AttachableCollectionError) {
+          return Response.json(
+            { error: error.message },
+            { status: error.status },
+          );
+        }
+        throw error;
       }
     }
 
